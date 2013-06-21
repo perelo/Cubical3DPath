@@ -60,7 +60,7 @@ class Camera:
     def reset(self):
         tangent = math.tan(self.FIELD_OF_VIEW_IN_DEGREES/2.0 / 180.0 * math.pi)
         distanceFromTarget = self.sceneRadius / tangent
-        self.target = Point3D(15,15,15)
+        self.target = Point3D(5,5,5)
         self.position = Point3D(self.target.x(),self.target.y(),distanceFromTarget)
         self.up = self.ground.returnCopy()
 
@@ -85,11 +85,13 @@ class Camera:
         else:
             viewportHeight = 2.0*viewportRadius
             viewportWidth = viewportHeight * self.viewportWidthInPixels / float(self.viewportHeightInPixels)
-        glFrustum(
-            - 0.5 * viewportWidth,  0.5 * viewportWidth,    # left, right
-            - 0.5 * viewportHeight, 0.5 * viewportHeight,   # bottom, top
-            self.nearPlane, self.farPlane
-            )
+        #glFrustum(
+            #- 0.5 * viewportWidth,  0.5 * viewportWidth,    # left, right
+            #- 0.5 * viewportHeight, 0.5 * viewportHeight,   # bottom, top
+            #self.nearPlane, self.farPlane
+            #)
+
+        gluPerspective(self.FIELD_OF_VIEW_IN_DEGREES, 1.0, self.nearPlane, self.farPlane)
 
         #M = Matrix4x4.lookAt(self.position, self.target, self.up, False)
         #glMultMatrixf(M.get())
