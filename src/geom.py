@@ -18,9 +18,9 @@ class Point2D:
     def y(self):
         return self.coordinates[1]
     def __repr__(self):
-        return "Point3D("+str(self.x())+","+str(self.y())+","+str(self.z())+")"
+        return "Point2D("+str(self.x())+","+str(self.y())+")"
     def __str__(self):
-        return "P("+str(self.x())+","+str(self.y())+","+str(self.z())+")"
+        return "P2("+str(self.x())+","+str(self.y())+")"
     def get(self):
         return self.coordinates
     def returnCopy(self):
@@ -48,7 +48,7 @@ class Point3D:
     def __repr__(self):
         return "Point3D("+str(self.x())+","+str(self.y())+","+str(self.z())+")"
     def __str__(self):
-        return "P("+str(self.x())+","+str(self.y())+","+str(self.z())+")"
+        return "P3("+str(self.x())+","+str(self.y())+","+str(self.z())+")"
     def get(self):
         return self.coordinates
     def returnCopy(self):
