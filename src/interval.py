@@ -13,7 +13,7 @@ from geom import *
 import util
 
 
-class StairModel:
+class Interval:
 
     def __init__(self):
         self.data = []      # list of tuples (list of data, type, r, g, b)
@@ -23,8 +23,8 @@ class StairModel:
     def init_data(self):
         #self.l_reconstructed()
 
-        self.data = [(util.flat_points(stair), GL_LINE_LOOP, 1, 0, 0)
-                            for stair in StairModel.gen_3_intervals(1, 1, 11, 11, 1)]
+        self.data = [(util.flat_points(interval), GL_LINE_LOOP, 1, 0, 0)
+                            for interval in Interval.gen_3_intervals(1, 1, 11, 11, 1)]
 
 
     def read_file(self, name):
@@ -135,15 +135,15 @@ class StairModel:
 
     @staticmethod
     def gen_3_intervals(xMin, yMin, xMax, yMax, step_size = 1):
-        stairxy = StairModel.generate_interval2D(xMin, yMin, xMax, yMax, step_size)
-        stairxz = StairModel.generate_interval2D(xMin, yMin, xMax, yMax, step_size)
-        stairyz = StairModel.generate_interval2D(xMin, yMin, xMax, yMax, step_size)
+        intervalxy = Interval.generate_interval2D(xMin, yMin, xMax, yMax, step_size)
+        intervalxz = Interval.generate_interval2D(xMin, yMin, xMax, yMax, step_size)
+        intervalyz = Interval.generate_interval2D(xMin, yMin, xMax, yMax, step_size)
 
-        stairxy = [Point3D(p2D.x(), p2D.y(), 0) for p2D in stairxy]
-        stairxz = [Point3D(p2D.y(), 0, p2D.x()) for p2D in stairxz]
-        stairyz = [Point3D(0, p2D.y(), p2D.x()) for p2D in stairyz]
+        intervalxy = [Point3D(p2D.x(), p2D.y(), 0) for p2D in intervalxy]
+        intervalxz = [Point3D(p2D.y(), 0, p2D.x()) for p2D in intervalxz]
+        intervalyz = [Point3D(0, p2D.y(), p2D.x()) for p2D in intervalyz]
 
-        return [stairxy, stairxz, stairyz]
+        return [intervalxy, intervalxz, intervalyz]
 
 
     @staticmethod

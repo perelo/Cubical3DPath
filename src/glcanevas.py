@@ -13,7 +13,7 @@ from PyQt4 import QtCore
 from PyQt4.QtOpenGL import *
 
 from camera import Camera
-from stair import *
+from interval import *
 
 
 class CanevasGLWidget(QGLWidget):
@@ -27,7 +27,7 @@ class CanevasGLWidget(QGLWidget):
         self.camera.setSceneRadius(50)
         self.camera.reset()
         self.oldx = self.oldy = 0
-        self.model = StairModel()
+        self.model = Interval()
 
 
     def paintGL(self):
