@@ -21,7 +21,7 @@ class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.move(100, 100)
-        self.setWindowTitle('Shortest path in 3D monoton stairs')
+        self.setWindowTitle('Shortest path in cubical complex')
 
         # Create main canevas that will render the OpenGL scene
         self.canevas = CanevasGLWidget(self)
@@ -31,7 +31,7 @@ class MainWindow(QtGui.QMainWindow):
         btn_reset.setStatusTip('Reset camera')
         self.connect(btn_reset, QtCore.SIGNAL('clicked()'), self.btn_reset_action)
         btn_generate = QtGui.QPushButton("Generate")
-        btn_generate.setToolTip('Generate random 2D stairs on the 3 planes')
+        btn_generate.setToolTip('Generate random 2D intervals on the 3 planes')
         self.connect(btn_generate, QtCore.SIGNAL('clicked()'), self.btn_generate_action)
 
         # Place the buttons
