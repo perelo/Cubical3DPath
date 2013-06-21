@@ -8,13 +8,48 @@ __author__ = 'Eloi Perdereau'
 __date__ = '17-06-2013'
 
 
+from OpenGL.GL import *     # types : GL_POINTS, GL_LINES, ...
 from geom import *
+import util
 
 
 class StairModel:
 
     def __init__(self):
-        self.squel = [
+        self.data = []      # list of tuples (list of data, type, r, g, b)
+        self.init_data()
+
+
+    def init_data(self):
+        #self.l_reconstructed()
+
+        self.data = [(util.flat_points(stair), GL_LINE_LOOP, 1, 0, 0)
+                            for stair in StairModel.gen_3_intervals(1, 1, 11, 11, 1)]
+
+
+    def read_file(self, name):
+        f = open(name, 'r')
+        size = f.readline()
+        size = int(size.split()[1])
+        f.readline()    # XY_POLYGON
+        f.readline()    # X MIN_Y MAX_T
+
+        array = []
+        for i in range(size):
+            l = f.readline()
+            s = l.split()
+            array.append((int(s[0]), int(s[1]), int(s[2])))
+        f.close()
+
+        lower_line = [Point3D(x, min_y, 0) for x, min_y, max_y in array]
+        upper_line = [Point3D(x, max_y, 0) for x, min_y, max_y in array]
+        upper_line.reverse()
+        lower_line.extend(upper_line)
+        return lower_line
+
+
+    def l_reconstructed(self):
+        raw_squel = [
                  Segment3D(Point3D( 5, 5, 5), Point3D( 5, 5,10)),
                  Segment3D(Point3D( 5, 5, 5), Point3D(15, 5, 5)),
                  Segment3D(Point3D( 5, 5,10), Point3D(15, 5,10)),
@@ -47,24 +82,28 @@ class StairModel:
                  #(20,10,10), (20,20,10), (20,10,20), (20,20,20),
               ]
 
-        self.flat_squel = [(x, y, z) for s in self.squel for x, y, z in s.flat()]
-        self.projxy = set([Segment3D(Point3D(s.a.x(), s.a.y(), 0), Point3D(s.b.x(), s.b.y(), 0)) \
-                                        for s in self.squel if ((s.a.x(), s.a.y()) != (s.b.x(), s.b.y()))])
-        self.projxz = set([Segment3D(Point3D(s.a.x(), 0, s.a.z()), Point3D(s.b.x(), 0, s.b.z())) \
-                                        for s in self.squel if ((s.a.x(), s.a.z()) != (s.b.x(), s.b.z()))])
-        self.projyz = set([Segment3D(Point3D(0, s.a.y(), s.a.z()), Point3D(0, s.b.y(), s.b.z())) \
-                                        for s in self.squel if ((s.a.y(), s.a.z()) != (s.b.y(), s.b.z()))])
+        flat_squel = util.flat_segments(raw_squel)
+        projxy = set([Segment3D(Point3D(s.a.x(), s.a.y(), 0), Point3D(s.b.x(), s.b.y(), 0)) \
+                                        for s in raw_squel if ((s.a.x(), s.a.y()) != (s.b.x(), s.b.y()))])
+        projxz = set([Segment3D(Point3D(s.a.x(), 0, s.a.z()), Point3D(s.b.x(), 0, s.b.z())) \
+                                        for s in raw_squel if ((s.a.x(), s.a.z()) != (s.b.x(), s.b.z()))])
+        projyz = set([Segment3D(Point3D(0, s.a.y(), s.a.z()), Point3D(0, s.b.y(), s.b.z())) \
+                                        for s in raw_squel if ((s.a.y(), s.a.z()) != (s.b.y(), s.b.z()))])
 
-        #print 'projxy =', len(self.projxy), self.projxy, '\n'
-        #print 'projxz =', len(self.projxz), self.projxz, '\n'
-        #print 'projyz =', len(self.projyz), self.projyz
+        flat_projxy = util.flat_segments(projxy)
+        flat_projxz = util.flat_segments(projxz)
+        flat_projyz = util.flat_segments(projyz)
 
-        self.flat_projxy = [(x, y, z) for s in self.projxy for x, y, z in s.flat()]
-        self.flat_projxz = [(x, y, z) for s in self.projxz for x, y, z in s.flat()]
-        self.flat_projyz = [(x, y, z) for s in self.projyz for x, y, z in s.flat()]
+        self.reconstruct_pts = self.reconstruct_points(flat_projxy, flat_projxz, flat_projyz)
+        reconstruct_seg = self.reconstruct_segments(projxy, projxz, projyz)
 
-        self.reconstruct_pts = self.reconstruct_points(self.flat_projxy, self.flat_projxz, self.flat_projyz)
-        self.reconstruct_seg = self.reconstruct_segments(self.projxy, self.projxz, self.projyz)
+
+        # append arrays to data
+        self.data.append((flat_projxy, GL_LINES, 1, 0, 0))
+        self.data.append((flat_projxz, GL_LINES, 1, 0, 0))
+        self.data.append((flat_projyz, GL_LINES, 1, 0, 0))
+
+        self.data.append((reconstruct_seg, GL_LINES, 1, 1, 1))
 
 
     def reconstruct_segments(self, projxy, projxz, projyz):
@@ -94,75 +133,54 @@ class StairModel:
         #print len(self.reconstruct)
 
 
-    def gen_3_stairs(self):
-        """ Generate three couple of monoton chains on the planes
-        """
-        array = []
+    @staticmethod
+    def gen_3_intervals(xMin, yMin, xMax, yMax, step_size = 1):
+        stairxy = StairModel.generate_interval2D(xMin, yMin, xMax, yMax, step_size)
+        stairxz = StairModel.generate_interval2D(xMin, yMin, xMax, yMax, step_size)
+        stairyz = StairModel.generate_interval2D(xMin, yMin, xMax, yMax, step_size)
 
-        # On (xy) plane
-        lower_line = generate_stair2D(10, 10, 30, 30, True, 10)
-        upper_line = generate_stair2D(10, 10, 30, 30, False, 10)
-        upper_line.reverse()
-        array = lower_line[1:]
-        array.extend(upper_line[1:])
-        stairxy = [(x, y, 0) for x, y in array]
+        stairxy = [Point3D(p2D.x(), p2D.y(), 0) for p2D in stairxy]
+        stairxz = [Point3D(p2D.y(), 0, p2D.x()) for p2D in stairxz]
+        stairyz = [Point3D(0, p2D.y(), p2D.x()) for p2D in stairyz]
 
-        # On (xz) plane
-        lower_line = stair.generate_stair2D(10, 10, 30, 30, True, 10)
-        upper_line = stair.generate_stair2D(10, 10, 30, 30, False, 10)
-        upper_line.reverse()
-        array = lower_line[1:]
-        array.extend(upper_line[1:])
-        stairxz = [(x, 0, z) for x, z in array]
-
-        # On (yz) plane
-        lower_line = stair.generate_stair2D(10, 10, 30, 30, True, 10)
-        upper_line = stair.generate_stair2D(10, 10, 30, 30, False, 10)
-        upper_line.reverse()
-        array = lower_line[1:]
-        array.extend(upper_line[1:])
-        stairyz = [(0, y, z) for y, z in array]
-
-        return (stairxy, stairxz, stairyz)
+        return [stairxy, stairxz, stairyz]
 
 
     @staticmethod
-    def generate_stair2D(xMin, yMin, xMax, yMax, n = None, start_horiz = False):
-        """ Generate a list of m couples (n <= m <= n*2) as 2D points,
-            joined together forming monotonically increasing rectiligne function
-            starting from (xMin, yMin), ending at (xMax, yMax).
-            start_horiz specifies the direction of the first "segment".
-            if n isn't provided, it will be set as random.randint(0, 10)
-        """
-        import random
-        if not n:
-            n = random.randint(0, 10)
+    def generate_interval2D(xMin, yMin, xMax, yMax, step_size = 1):
+        from random import randrange
 
-        pointsX = random.sample(range(xMin, xMax), n)
-        pointsY = random.sample(range(yMin, yMax), n)
-        pointsX.sort()
-        pointsY.sort()
-        points = zip(pointsX, pointsY)
-        points.insert(0, (xMin, yMin))
-        points.append((xMax, yMax))
+        lower_line = [Point2D(xMin, yMin)]
+        upper_line = [Point2D(xMin, randrange(yMin, yMax+1, step_size))]
 
-        return rectilinize(points, start_horiz)
+        old_low  = lower_line[0].y()
+        old_high = upper_line[0].y()
 
+        lower_line_done = upper_line_done = False
+        for i in range(xMin+step_size, xMax, step_size):
+            if not lower_line_done:
+                low = randrange(old_low, yMax+1, step_size)
+                if low >= yMax:
+                    lower_line_done = True
+                else:
+                    if old_low < low:
+                        lower_line.append(Point2D(i, old_low))
+                        lower_line.append(Point2D(i, low))
+                    old_low = low
 
-    @staticmethod
-    def rectilinize(points, start_horiz):
-        """ Return the given list of points on which we have added new points
-            so the graph formed by the line segments between consecutive points
-            is formed by just horizontal and vertical line segments
-        """
-        result = []
-        for i in range(len(points)-1):
-            result.append(points[i])
-            if start_horiz and points[i][1] != points[i+1][1]:
-                result.append((points[i+1][0], points[i][1]))
-            elif not start_horiz and points[i][0] != points[i+1][0]:
-                result.append((points[i][0], points[i+1][1]))
-            start_horiz = not start_horiz
-        result.append(points[-1])
-        return result
+            if not upper_line_done:
+                high = randrange(max(low, old_high), yMax+1, step_size)
+                if old_high < high:
+                    upper_line.append(Point2D(i, old_high))
+                    upper_line.append(Point2D(i, high))
+                if high >= yMax:
+                    upper_line_done = True
+                old_high = high
+        upper_line.append(Point2D(xMax, yMax))
+        lower_line.append(Point2D(xMax, old_low))
+
+        upper_line.reverse()
+        lower_line.extend(upper_line)
+        return lower_line
+
 

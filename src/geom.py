@@ -10,6 +10,32 @@ __date__ = '17-06-2013'
 
 import math
 
+class Point2D:
+    def __init__(self,x=0,y=0):
+        self.coordinates = [x,y]
+    def x(self):
+        return self.coordinates[0]
+    def y(self):
+        return self.coordinates[1]
+    def __repr__(self):
+        return "Point3D("+str(self.x())+","+str(self.y())+","+str(self.z())+")"
+    def __str__(self):
+        return "P("+str(self.x())+","+str(self.y())+","+str(self.z())+")"
+    def get(self):
+        return self.coordinates
+    def returnCopy(self):
+        return Point2D( self.x(), self.y() )
+    def average(self,other):
+        return Point2D( (self.x()+other.x())*0.5, (self.y()+other.y())*0.5 )
+    def __add__(self,other):
+        return Point2D( self.x()+other.x(), self.y()+other.y() )
+    def __hash__(self):
+        return hash(self.coordinates[0]) + hash(self.coordinates[1])
+    def __eq__(self,other):
+        return self.x()==other.x() and self.y()==other.y()
+    def __ne__(self,other):
+        return not (self==other)
+
 class Point3D:
     def __init__(self,x=0,y=0,z=0):
         self.coordinates = [x,y,z]

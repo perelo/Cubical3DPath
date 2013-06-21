@@ -59,9 +59,8 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def btn_generate_action(self):
-        print 'disabled for tests'
-        #self.canevas.gen_3_stairs()
-        #self.canevas.update()
+        self.canevas.model.init_data()
+        self.canevas.update()
 
 
 if __name__ == '__main__':

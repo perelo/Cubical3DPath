@@ -46,23 +46,11 @@ class CanevasGLWidget(QGLWidget):
         #glDisable(GL_LIGHTING);     # disable lighting
         #glShadeModel(GL_FLAT);      # no shades, no light, all same color
 
-        #glColor(1.0, 1.0, 1.0)
-
         glEnableClientState(GL_VERTEX_ARRAY)
-        glColor(1.0, 0.0, 0.0)
-        glVertexPointer(3, GL_FLOAT, 0, self.model.flat_projxy)
-        glDrawArrays(GL_LINES, 0, len(self.model.flat_projxy))
-        glVertexPointer(3, GL_FLOAT, 0, self.model.flat_projxz)
-        glDrawArrays(GL_LINES, 0, len(self.model.flat_projxz))
-        glVertexPointer(3, GL_FLOAT, 0, self.model.flat_projyz)
-        glDrawArrays(GL_LINES, 0, len(self.model.flat_projyz))
-        glColor(1.0, 1.0, 1.0)
-        #glVertexPointer(3, GL_FLOAT, 0, self.model.flat_squel)
-        #glDrawArrays(GL_LINES, 0, len(self.model.flat_squel))
-        #glVertexPointer(3, GL_FLOAT, 0, list(self.model.reconstruct_pts))
-        #glDrawArrays(GL_POINTS, 0, len(self.model.reconstruct_pts))
-        glVertexPointer(3, GL_FLOAT, 0, self.model.reconstruct_seg)
-        glDrawArrays(GL_LINES, 0, len(self.model.reconstruct_seg))
+        for array, gl_type, r, g, b in self.model.data:
+            glColor(r, g, b)
+            glVertexPointer(3, GL_FLOAT, 0, array)
+            glDrawArrays(gl_type, 0, len(array))
         glDisableClientState(GL_VERTEX_ARRAY)
 
         # Draw axis
