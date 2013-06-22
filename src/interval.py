@@ -27,27 +27,6 @@ class Interval:
                             for interval in Interval.gen_3_intervals(1, 1, 11, 11, 1)]
 
 
-    def read_file(self, name):
-        f = open(name, 'r')
-        size = f.readline()
-        size = int(size.split()[1])
-        f.readline()    # XY_POLYGON
-        f.readline()    # X MIN_Y MAX_T
-
-        array = []
-        for i in range(size):
-            l = f.readline()
-            s = l.split()
-            array.append((int(s[0]), int(s[1]), int(s[2])))
-        f.close()
-
-        lower_line = [Point3D(x, min_y, 0) for x, min_y, max_y in array]
-        upper_line = [Point3D(x, max_y, 0) for x, min_y, max_y in array]
-        upper_line.reverse()
-        lower_line.extend(upper_line)
-        return lower_line
-
-
     def l_reconstructed(self):
         raw_squel = [
                  Segment3D(Point3D( 5, 5, 5), Point3D( 5, 5,10)),
@@ -183,4 +162,17 @@ class Interval:
         lower_line.extend(upper_line)
         return lower_line
 
+
+    @staticmethod
+    def write_2d_intervals(f, xy, xz, yz):
+        f.write('xy\n')
+        for p in xy:
+            f.write('{0[0]} {0[1]} {0[2]}\n'.format(p.get()))
+        f.write('\nxz\n')
+        for p in xz:
+            f.write('{0[0]} {0[1]} {0[2]}\n'.format(p.get()))
+        f.write('\nyz\n')
+        for p in yz:
+            f.write('{0[0]} {0[1]} {0[2]}\n'.format(p.get()))
+        f.write('\n')
 
