@@ -30,14 +30,23 @@ class MainWindow(QtGui.QMainWindow):
         btn_reset = QtGui.QPushButton("Reset")
         btn_reset.setStatusTip('Reset camera')
         self.connect(btn_reset, QtCore.SIGNAL('clicked()'), self.btn_reset_action)
+
         btn_generate = QtGui.QPushButton("Generate")
         btn_generate.setToolTip('Generate random 2D intervals on the 3 planes')
         self.connect(btn_generate, QtCore.SIGNAL('clicked()'), self.btn_generate_action)
+
+        btn_save = QtGui.QPushButton("Save")
+        self.connect(btn_save, QtCore.SIGNAL('clicked()'), self.btn_save_action)
+
+        btn_load = QtGui.QPushButton("Load")
+        self.connect(btn_load, QtCore.SIGNAL('clicked()'), self.btn_load_action)
 
         # Place the buttons
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(btn_reset)
         vbox.addWidget(btn_generate)
+        vbox.addWidget(btn_save)
+        vbox.addWidget(btn_load)
         vbox.addStretch(1)
 
         # Place main components
@@ -57,10 +66,23 @@ class MainWindow(QtGui.QMainWindow):
         self.canevas.camera.reset()
         self.canevas.update()
 
-
     def btn_generate_action(self):
         self.canevas.model.init_data()
         self.canevas.update()
+
+    def btn_save_action(self):
+        file_name = QtGui.QFileDialog.getSaveFileName(self, 'Save data as binary file', 'data.i3d', 'Interval3D (*.i3d*)')
+        if file_name:
+            f = open(file_name, 'w')
+            self.canevas.save_data(f)
+            f.close()
+
+    def btn_load_action(self):
+        file_name = QtGui.QFileDialog.getOpenFileName(self, 'Open binary data file', '', 'Interval3D (*.i3d*)')
+        if file_name:
+            f = open(file_name, 'r')
+            self.canevas.load_data(f)
+            f.close()
 
 
 if __name__ == '__main__':

@@ -8,6 +8,8 @@ __author__ = 'Eloi Perdereau'
 __date__ = '19-06-2013'
 
 
+from pickle import dump, load
+
 from OpenGL.GL import *
 from PyQt4 import QtCore
 from PyQt4.QtOpenGL import *
@@ -98,4 +100,11 @@ class CanevasGLWidget(QGLWidget):
             self.update()
         self.oldx = mouseEvent.x()
         self.oldy = mouseEvent.y()
+
+
+    def save_data(self, f):
+         dump(self.model.data, f, 2) # 2 for better pickling of new-style classes
+
+    def load_data(self, f):
+        self.model.data = load(f)
 
