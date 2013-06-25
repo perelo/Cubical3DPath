@@ -20,6 +20,7 @@ class Camera:
     def __init__(self):
         self.FIELD_OF_VIEW_IN_DEGREES = 50.0
         self.ORBITING_SPEED_IN_DEGREES_PER_RADIUS_OF_VIEWPORT = 300.0
+        self.TRANSLATION_SPEED_FACTOR = 0.5 # the higher this, the faster
 
         # These are in world-space units.
         self.nearPlane = 1.0
@@ -146,8 +147,8 @@ class Camera:
         distanceFromTarget = direction.length()
         direction = direction.normalized()
 
-        translationSpeedInUnitsPerRadius = distanceFromTarget * math.tan( self.FIELD_OF_VIEW_IN_DEGREES/2.0 / 180.0 * math.pi )
-        pixelsPerUnit = self.viewportRadiusInPixels / translationSpeedInUnitsPerRadius
+        translationSpeed = distanceFromTarget * self.TRANSLATION_SPEED_FACTOR
+        pixelsPerUnit = self.viewportRadiusInPixels / translationSpeed
 
         dollyDistance = delta_pixels / pixelsPerUnit
 
