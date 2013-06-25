@@ -18,7 +18,7 @@ from geom import *
 
 class Camera:
     def __init__(self):
-        self.FIELD_OF_VIEW_IN_DEGREES = 50.0
+        self.FIELD_OF_VIEW_IN_DEGREES = 1.0
         self.ORBITING_SPEED_IN_DEGREES_PER_RADIUS_OF_VIEWPORT = 300.0
         self.TRANSLATION_SPEED_FACTOR = 0.5 # the higher this, the faster
 
