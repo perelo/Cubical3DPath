@@ -24,10 +24,58 @@ class Interval:
     def init_data(self):
         #self.l_reconstructed()
 
-        intervals = Interval.gen_3_intervals(5, 5, 25, 25, 2)
+        intervals = Interval.gen_3_intervals(5, 5, 15, 15, 1)
         flat_intervals = [util.flat_points(interval) for interval in intervals]
         self.data = [(interval, GL_LINE_LOOP, 1, 0, 0)
                             for interval in flat_intervals]
+
+        points_3d = Interval.points3d_from_projection(Point3D(5, 5, 5), Point3D(15, 15, 15), *intervals)
+        self.data.append((util.flat_points(points_3d), GL_POINTS, 1, 1, 1))
+
+
+    @staticmethod
+    def points3d_from_projection(p_min, p_max, xy, xz, yz):
+        step = 0.5
+        points3d = []
+        for x in np.arange(p_min.x(), p_max.x() + step, step):
+            for y in np.arange(p_min.y(), p_max.y() + step, step):
+                for z in np.arange(p_min.z(), p_max.z() + step, step):
+                    p = Point3D(x, y, z)
+                    if Interval.is_in(p, xy, Point3D.x, Point3D.y) and \
+                       Interval.is_in(p, xz, Point3D.z, Point3D.x) and \
+                       Interval.is_in(p, yz, Point3D.z, Point3D.y):
+                        points3d.append(p)
+
+        return points3d
+
+
+    @staticmethod
+    def is_in(point, polygon, x, y, close = True):
+        # throw two rays horizontally in both ways
+        # right_ray and left_ray tells if they cross an odd number of segments
+        # we need both ways because there are some cases (e.g upper horizontal line)
+        # where right_ray is odd and left_ray is zero
+        sz = len(polygon)
+        right_ray = left_ray = False
+        for i in range(sz):
+            p1, p2 = polygon[i], polygon[(i+1)%sz]
+
+            if y(p1) <= y(point) <= y(p2) or \
+               y(p1) >= y(point) >= y(p2):
+
+                if close:
+                    # test if point is in the line segment [p1, p2]
+                    if (x(p1) <= x(point) <= x(p2) or \
+                        x(p1) >= x(point) >= x(p2)) and \
+                       ((x(point)-x(p1))*(y(p2)-y(point)) == (x(p2)-x(point))*(y(point)-y(p1))):
+                       return True
+
+                if x(point) <= min((x(p1), x(p2))):
+                    right_ray = not right_ray
+                if x(point) >= max((x(p1), x(p2))):
+                    left_ray = not left_ray
+
+        return right_ray == left_ray and right_ray
 
 
     @staticmethod
