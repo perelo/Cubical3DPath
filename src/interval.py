@@ -8,6 +8,7 @@ __author__ = 'Eloi Perdereau'
 __date__ = '17-06-2013'
 
 
+import numpy as np
 from OpenGL.GL import *     # types : GL_POINTS, GL_LINES, ...
 from geom import *
 import util
@@ -23,93 +24,10 @@ class Interval:
     def init_data(self):
         #self.l_reconstructed()
 
-        self.data = [(util.flat_points(interval), GL_LINE_LOOP, 1, 0, 0)
-                            for interval in Interval.gen_3_intervals(1, 1, 11, 11, 1)]
-
-
-    def l_reconstructed(self):
-        raw_squel = [
-                 Segment3D(Point3D( 5, 5, 5), Point3D( 5, 5,10)),
-                 Segment3D(Point3D( 5, 5, 5), Point3D(15, 5, 5)),
-                 Segment3D(Point3D( 5, 5,10), Point3D(15, 5,10)),
-                 Segment3D(Point3D(15, 5, 5), Point3D(15, 5,10)),
-
-                 Segment3D(Point3D( 5,10, 5), Point3D( 5,10,10)),
-                 Segment3D(Point3D( 5,10, 5), Point3D(10,10, 5)),
-                 Segment3D(Point3D( 5,10,10), Point3D(10,10,10)),
-
-                 Segment3D(Point3D( 5, 5, 5), Point3D( 5,10, 5)),
-                 Segment3D(Point3D( 5, 5,10), Point3D( 5,10,10)),
-
-                 Segment3D(Point3D(10,10, 5), Point3D(10,20, 5)),
-                 Segment3D(Point3D(10,10,10), Point3D(10,20,10)),
-
-                 Segment3D(Point3D(15, 5, 5), Point3D(15,20, 5)),
-                 Segment3D(Point3D(15, 5,10), Point3D(15,20,10)),
-
-                 Segment3D(Point3D(10,20, 5), Point3D(15,20, 5)),
-                 Segment3D(Point3D(15,20, 5), Point3D(15,20,10)),
-                 Segment3D(Point3D(15,20,10), Point3D(10,20,10)),
-                 Segment3D(Point3D(10,20,10), Point3D(10,20, 5)),
-
-
-                 #(10,10,10), (20,10,10), (10,20,10), (20,20,10),
-                 #(10,10,20), (20,10,20), (10,20,20), (20,20,20),
-                 #(10,10,10), (10,10,20), (20,10,10), (20,10,20),
-                 #(10,20,10), (10,20,20), (20,20,10), (20,20,20),
-                 #(10,10,10), (10,20,10), (10,10,20), (10,20,20),
-                 #(20,10,10), (20,20,10), (20,10,20), (20,20,20),
-              ]
-
-        flat_squel = util.flat_segments(raw_squel)
-        projxy = set([Segment3D(Point3D(s.a.x(), s.a.y(), 0), Point3D(s.b.x(), s.b.y(), 0)) \
-                                        for s in raw_squel if ((s.a.x(), s.a.y()) != (s.b.x(), s.b.y()))])
-        projxz = set([Segment3D(Point3D(s.a.x(), 0, s.a.z()), Point3D(s.b.x(), 0, s.b.z())) \
-                                        for s in raw_squel if ((s.a.x(), s.a.z()) != (s.b.x(), s.b.z()))])
-        projyz = set([Segment3D(Point3D(0, s.a.y(), s.a.z()), Point3D(0, s.b.y(), s.b.z())) \
-                                        for s in raw_squel if ((s.a.y(), s.a.z()) != (s.b.y(), s.b.z()))])
-
-        flat_projxy = util.flat_segments(projxy)
-        flat_projxz = util.flat_segments(projxz)
-        flat_projyz = util.flat_segments(projyz)
-
-        self.reconstruct_pts = self.reconstruct_points(flat_projxy, flat_projxz, flat_projyz)
-        reconstruct_seg = self.reconstruct_segments(projxy, projxz, projyz)
-
-
-        # append arrays to data
-        self.data.append((flat_projxy, GL_LINES, 1, 0, 0))
-        self.data.append((flat_projxz, GL_LINES, 1, 0, 0))
-        self.data.append((flat_projyz, GL_LINES, 1, 0, 0))
-
-        self.data.append((reconstruct_seg, GL_LINES, 1, 1, 1))
-
-
-    def reconstruct_segments(self, projxy, projxz, projyz):
-        result_set = set()
-        for x1, y1, z1 in self.reconstruct_pts:
-            for x2, y2, z2 in self.reconstruct_pts:
-                if (x1, y1, z1) != (x2, y2, z2) and \
-                   ((x1 != x2 and y1 == y2 and z1 == z2) or
-                    (x1 == x2 and y1 != y2 and z1 == z2) or
-                    (x1 == x2 and y1 == y2 and z1 != z2)):
-                    result_set.add(Segment3D(Point3D(x1, y1, z1), Point3D(x2, y2, z2)))
-        return [(x, y, z) for s in result_set for x, y, z in (s.a.coordinates, s.b.coordinates)]
-
-
-    def reconstruct_points(self, projxy, projxz, projyz):
-        reconstruct_set = set()
-
-        zero = 0
-        for x_xy, y_xy, zero in projxy:
-            for x_xz, zero, z_xz in projxz:
-                if x_xy == x_xz:
-                    for zero, y_yz, z_yz in projyz:
-                        if y_xy == y_yz and z_xz == z_yz:
-                            reconstruct_set.add((x_xy, y_yz, z_xz))
-        #self.reconstruct = list(reconstruct_set)
-        return reconstruct_set
-        #print len(self.reconstruct)
+        intervals = Interval.gen_3_intervals(5, 5, 25, 25, 2)
+        flat_intervals = [util.flat_points(interval) for interval in intervals]
+        self.data = [(interval, GL_LINE_LOOP, 1, 0, 0)
+                            for interval in flat_intervals]
 
 
     @staticmethod
