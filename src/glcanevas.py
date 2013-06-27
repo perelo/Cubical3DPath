@@ -26,7 +26,7 @@ class CanevasGLWidget(QGLWidget):
         self.setMinimumSize(500, 500)
 
         self.camera = Camera()
-        self.camera.setSceneRadius(50)
+        self.camera.setSceneRadius(20)
         self.camera.reset()
         self.oldx = self.oldy = 0
         self.model = Interval()
