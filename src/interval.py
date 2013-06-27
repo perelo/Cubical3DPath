@@ -30,7 +30,41 @@ class Interval:
                             for interval in flat_intervals]
 
         points_3d = Interval.points3d_from_projection(Point3D(5, 5, 5), Point3D(15, 15, 15), *intervals)
+        segments = Interval.extract_skeleton(points_3d[:])
+
+        self.data.append((util.flat_segments(segments), GL_LINES, 0, 0, 1))
         self.data.append((util.flat_points(points_3d), GL_POINTS, 1, 1, 1))
+
+
+    @staticmethod
+    def extract_skeleton(points):
+        # list of tuples of indices in points to be converted in segments
+        skeleton = []
+
+        get_zyx = lambda p: (p.z(), p.y(), p.x())
+        points.sort(key=get_zyx)
+
+        pos = 0
+        z_ref = points[pos].z()
+        y_ref = points[pos].y()
+        for i in range(len(points)):
+            p = points[i]
+
+            if p.y() != y_ref:
+                if not skeleton:
+                    skeleton.append((pos, i-1))
+                else:
+                    len_last_seg = skeleton[-1][1] - skeleton[-1][0]
+                    len_this_seg = i-1 - pos
+                    diff = len_this_seg - len_last_seg
+                    if diff != 0:
+                        skeleton.append((pos, i-1))
+                y_ref = p.y()
+                pos = i
+
+        skeleton.append((pos, len(points)-1))
+
+        return [Segment3D(points[a], points[b]) for a, b in skeleton if a != b]
 
 
     @staticmethod
