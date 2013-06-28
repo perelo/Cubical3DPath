@@ -71,14 +71,14 @@ class MainWindow(QtGui.QMainWindow):
         self.canevas.update()
 
     def btn_save_action(self):
-        file_name = QtGui.QFileDialog.getSaveFileName(self, 'Save data as binary file', 'data.i3d', 'Interval3D (*.i3d*)')
+        file_name = QtGui.QFileDialog.getSaveFileName(self, 'Save intervals as binary file', 'data.i3db', 'Interval3D (*.i3db*)')
         if file_name:
             f = open(file_name, 'w')
             self.canevas.save_data(f)
             f.close()
 
     def btn_load_action(self):
-        file_name = QtGui.QFileDialog.getOpenFileName(self, 'Open binary data file', '', 'Interval3D (*.i3d*)')
+        file_name = QtGui.QFileDialog.getOpenFileName(self, 'Open binary intervals file', '', 'Interval3D (*.i3db*)')
         if file_name:
             f = open(file_name, 'r')
             self.canevas.load_data(f)
