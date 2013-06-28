@@ -18,18 +18,22 @@ class Interval:
 
     def __init__(self):
         self.data = []      # list of tuples (list of data, type, r, g, b)
+        self.intervals = []
         self.init_data()
 
 
-    def init_data(self):
+    def init_data(self, intervals = None):
         #self.l_reconstructed()
 
-        intervals = Interval.gen_3_intervals(5, 5, 15, 15, 1)
-        flat_intervals = [util.flat_points(interval) for interval in intervals]
+        self.intervals = Interval.gen_3_intervals(5, 5, 15, 15, 1) \
+                                            if intervals is None \
+                                            else intervals
+
+        flat_intervals = [util.flat_points(interval) for interval in self.intervals]
         self.data = [(interval, GL_LINE_LOOP, 1, 0, 0)
                             for interval in flat_intervals]
 
-        points_3d = Interval.points3d_from_projection(Point3D(5, 5, 5), Point3D(15, 15, 15), *intervals)
+        points_3d = Interval.points3d_from_projection(Point3D(5, 5, 5), Point3D(15, 15, 15), *self.intervals)
         segments = Interval.extract_skeleton(points_3d[:])
 
         self.data.append((util.flat_segments(segments), GL_LINES, 0, 0, 1))

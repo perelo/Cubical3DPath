@@ -103,8 +103,8 @@ class CanevasGLWidget(QGLWidget):
 
 
     def save_data(self, f):
-         dump(self.model.data, f, 2) # 2 for better pickling of new-style classes
+         dump(self.model.intervals, f, 2) # 2 for better pickling of new-style classes
 
     def load_data(self, f):
-        self.model.data = load(f)
+        self.model.init_data(load(f))
 
