@@ -29,7 +29,7 @@ class Interval:
                                             if intervals is None \
                                             else intervals
 
-        data = []
+        self.data = []
         #flat_intervals = [util.flat_points(interval) for interval in self.intervals]
         #self.data = [(interval, GL_LINE_LOOP, 1, 0, 0)
                             #for interval in flat_intervals]
