@@ -37,7 +37,7 @@ class Interval:
         points_3d = Interval.points3d_from_projection(Point3D(5, 5, 5), Point3D(15, 15, 15), *self.intervals)
         segments = Interval.extract_skeleton(points_3d, 1)
 
-        self.data.append((util.flat_segments(segments), GL_LINES, 0, 0, 1))
+        self.data.append((util.flat_segments(segments), GL_LINES, 1, 1, 1))
         #self.data.append((util.flat_points(points_3d), GL_POINTS, 1, 1, 1))
 
         for proj in Interval.get_project_edges(segments):
