@@ -29,15 +29,19 @@ class Interval:
                                             if intervals is None \
                                             else intervals
 
-        flat_intervals = [util.flat_points(interval) for interval in self.intervals]
-        self.data = [(interval, GL_LINE_LOOP, 1, 0, 0)
-                            for interval in flat_intervals]
+        data = []
+        #flat_intervals = [util.flat_points(interval) for interval in self.intervals]
+        #self.data = [(interval, GL_LINE_LOOP, 1, 0, 0)
+                            #for interval in flat_intervals]
 
         points_3d = Interval.points3d_from_projection(Point3D(5, 5, 5), Point3D(15, 15, 15), *self.intervals)
         segments = Interval.extract_skeleton(points_3d, 1)
 
         self.data.append((util.flat_segments(segments), GL_LINES, 0, 0, 1))
         #self.data.append((util.flat_points(points_3d), GL_POINTS, 1, 1, 1))
+
+        for proj in Interval.get_project_edges(segments):
+            self.data.append((util.flat_segments(proj), GL_LINES, 1, 0, 0))
 
 
     @staticmethod
