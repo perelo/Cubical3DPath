@@ -87,21 +87,21 @@ class Interval:
 
     @staticmethod
     def is_eligible(points, p, step, x, y, z, create_point):
-            up    = create_point(x(p), y(p)+1, z(p)  ) in points
-            down  = create_point(x(p), y(p)-1, z(p)  ) in points
-            front = create_point(x(p), y(p)  , z(p)+1) in points
-            back  = create_point(x(p), y(p)  , z(p)-1) in points
+        up    = create_point(x(p), y(p)+1, z(p)  ) in points
+        down  = create_point(x(p), y(p)-1, z(p)  ) in points
+        front = create_point(x(p), y(p)  , z(p)+1) in points
+        back  = create_point(x(p), y(p)  , z(p)-1) in points
 
-            if (up and down) or (front and back):
-                # detect convex edges
-                up_back    = create_point(x(p), y(p)+1, z(p)-1) in points
-                down_front = create_point(x(p), y(p)-1, z(p)+1) in points
-                if up and down:
-                    return (back and not up_back) or (front and not down_front)
-                else: # front and back
-                    return (up and not up_back) or (down and not down_front)
+        if (up and down) or (front and back):
+            # detect convex edges
+            up_back    = create_point(x(p), y(p)+1, z(p)-1) in points
+            down_front = create_point(x(p), y(p)-1, z(p)+1) in points
+            if up and down:
+                return (back and not up_back) or (front and not down_front)
+            else: # front and back
+                return (up and not up_back) or (down and not down_front)
 
-            return True
+        return True
 
 
     @staticmethod
