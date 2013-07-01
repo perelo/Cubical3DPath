@@ -34,46 +34,76 @@ class Interval:
                             for interval in flat_intervals]
 
         points_3d = Interval.points3d_from_projection(Point3D(5, 5, 5), Point3D(15, 15, 15), *self.intervals)
-        segments = Interval.extract_skeleton(points_3d[:])
+        segments = Interval.extract_skeleton(points_3d, 1)
 
         self.data.append((util.flat_segments(segments), GL_LINES, 0, 0, 1))
-        self.data.append((util.flat_points(points_3d), GL_POINTS, 1, 1, 1))
+        #self.data.append((util.flat_points(points_3d), GL_POINTS, 1, 1, 1))
 
 
     @staticmethod
-    def extract_skeleton(points):
-        # list of tuples of indices in points to be converted in segments
+    def extract_skeleton(points, step):
         skeleton = []
 
         get_zyx = lambda p: (p.z(), p.y(), p.x())
-        points.sort(key=get_zyx)
+        get_xyz = lambda p: (p.x(), p.y(), p.z())
+        get_zxy = lambda p: (p.z(), p.x(), p.y())
 
-        pos = 0
-        z_ref = points[pos].z()
-        y_ref = points[pos].y()
-        for i in range(len(points)):
-            p = points[i]
+        create_point_xyz = lambda x, y, z: Point3D(x, y, z)
+        skeleton.extend(Interval.get_edges(sorted(points, key=get_zyx), step,
+                                           Point3D.x, Point3D.y, Point3D.z, create_point_xyz))
 
-            if p.y() != y_ref:
-                if not skeleton:
-                    skeleton.append((pos, i-1))
-                else:
-                    len_last_seg = skeleton[-1][1] - skeleton[-1][0]
-                    len_this_seg = i-1 - pos
-                    diff = len_this_seg - len_last_seg
-                    if diff != 0:
-                        skeleton.append((pos, i-1))
-                y_ref = p.y()
-                pos = i
+        create_point_zyx = lambda x, y, z: Point3D(z, y, x)
+        skeleton.extend(Interval.get_edges(sorted(points, key=get_xyz), step,
+                                           Point3D.z, Point3D.y, Point3D.x, create_point_zyx))
 
-        skeleton.append((pos, len(points)-1))
+        create_point_yxz = lambda x, y, z: Point3D(y, x, z)
+        skeleton.extend(Interval.get_edges(sorted(points, key=get_zxy), step,
+                                           Point3D.y, Point3D.x, Point3D.z, create_point_yxz))
 
-        return [Segment3D(points[a], points[b]) for a, b in skeleton if a != b]
+        return skeleton
+
+
+    @staticmethod
+    def get_edges(points, step, x, y, z, create_point):
+        edges = [] # unitary edges
+
+        y_ref = y(points[0])
+        z_ref = z(points[0])
+        for i in range(0, len(points)-1):
+            p = points[i  ]
+            q = points[i+1]
+
+            if y(q) != y_ref or z(q) != z_ref:
+                y_ref = y(q)
+                z_ref = z(q)
+                continue
+
+            if Interval.is_eligible(points, p, step, x, y, z, create_point) or \
+               Interval.is_eligible(points, q, step, x, y, z, create_point):
+                edges.append((i, i+1))
+
+        return [Segment3D(points[a], points[b]) for a, b in edges]
+
+
+    @staticmethod
+    def is_eligible(points, p, step, x, y, z, create_point):
+            up    = create_point(x(p), y(p)+1, z(p)  ) in points
+            down  = create_point(x(p), y(p)-1, z(p)  ) in points
+            front = create_point(x(p), y(p)  , z(p)+1) in points
+            back  = create_point(x(p), y(p)  , z(p)-1) in points
+
+            if (up and down) or (front and back):
+                # detect convex edges
+                up_back    = create_point(x(p), y(p)+1, z(p)-1) in points
+                down_front = create_point(x(p), y(p)-1, z(p)+1) in points
+                return up and down and ((back and not up_back) or (front and not down_front))
+
+            return True
 
 
     @staticmethod
     def points3d_from_projection(p_min, p_max, xy, xz, yz):
-        step = 0.5
+        step = 1
         points3d = []
         for x in np.arange(p_min.x(), p_max.x() + step, step):
             for y in np.arange(p_min.y(), p_max.y() + step, step):
