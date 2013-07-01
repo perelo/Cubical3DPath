@@ -41,6 +41,18 @@ class Interval:
 
 
     @staticmethod
+    def get_project_edges(edges):
+        xy = [Segment3D(Point3D(e.a.x(), e.a.y(), 0), Point3D(e.b.x(), e.b.y(), 0))
+                                                                for e in edges if e.a.z() == e.b.z()]
+        xz = [Segment3D(Point3D(e.a.x(), 0, e.a.z()), Point3D(e.b.x(), 0, e.b.z()))
+                                                                for e in edges if e.a.y() == e.b.y()]
+        yz = [Segment3D(Point3D(0, e.a.y(), e.a.z()), Point3D(0, e.b.y(), e.b.z()))
+                                                                for e in edges if e.a.x() == e.b.x()]
+
+        return (xy, xz, yz)
+
+
+    @staticmethod
     def extract_skeleton(points, step):
         skeleton = []
 
