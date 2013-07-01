@@ -96,7 +96,10 @@ class Interval:
                 # detect convex edges
                 up_back    = create_point(x(p), y(p)+1, z(p)-1) in points
                 down_front = create_point(x(p), y(p)-1, z(p)+1) in points
-                return up and down and ((back and not up_back) or (front and not down_front))
+                if up and down:
+                    return (back and not up_back) or (front and not down_front)
+                else: # front and back
+                    return (up and not up_back) or (down and not down_front)
 
             return True
 
