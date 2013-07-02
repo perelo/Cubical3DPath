@@ -183,31 +183,41 @@ class Interval:
         from random import randrange
 
         lower_line = [Point2D(xMin, yMin)]
-        upper_line = [Point2D(xMin, randrange(yMin, yMax+1, step_size))]
+        upper_line = [Point2D(xMin, randrange(yMin+1, yMax+1, step_size))]
 
         old_low  = lower_line[0].y()
         old_high = upper_line[0].y()
 
+        # iterate through x with a defined step
+        # for each step, pick a low and a high y coordinate
+        # for lower and higher line respectively. Pick them right!
         lower_line_done = upper_line_done = False
         for i in range(xMin+step_size, xMax, step_size):
             if not lower_line_done:
-                low = randrange(old_low, yMax+1, step_size)
+                # min: old_low to keep lower_line going up
+                # max: old_high+1 to prevent vertical overlap
+                low = randrange(old_low, old_high+1, step_size)
                 if low >= yMax:
                     lower_line_done = True
-                else:
-                    if old_low < low:
-                        lower_line.append(Point2D(i, old_low))
-                        lower_line.append(Point2D(i, low))
+                elif old_low < low: # old_low cannot be greater than low
+                    # add points to make the lower_line rectilinear
+                    lower_line.append(Point2D(i, old_low))
+                    lower_line.append(Point2D(i, low))
                     old_low = low
 
             if not upper_line_done:
-                high = randrange(max(low, old_high), yMax+1, step_size)
+                # min: low to prevent crossing + inc to prevent horizontal overlap
+                # max: yMax+1 to reach yMax but not go further
+                inc = 1 if not lower_line_done else 0
+                high = randrange(max(low+inc, old_high), yMax+1, step_size)
                 if old_high < high:
+                    # add points to make the upper_line rectilinear
                     upper_line.append(Point2D(i, old_high))
                     upper_line.append(Point2D(i, high))
+                    old_high = high
                 if high >= yMax:
                     upper_line_done = True
-                old_high = high
+
         upper_line.append(Point2D(xMax, yMax))
         lower_line.append(Point2D(xMax, old_low))
 
