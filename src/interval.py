@@ -19,6 +19,10 @@ class Interval2D:
         self.points = points
 
 
+    def __str__(self):
+        return '\n'.join(' '.join(str(coord) for coord in p.get()) for p in self.points)
+
+
     @staticmethod
     def generate_random_2D(p_min, p_max, step_size = 1):
         from random import randrange
@@ -241,13 +245,10 @@ class Intervals:
     @staticmethod
     def write_2d_intervals(f, xy, xz, yz):
         f.write('xy\n')
-        for p in xy:
-            f.write('{0[0]} {0[1]} {0[2]}\n'.format(p.get()))
+        f.write(str(xy))
         f.write('\nxz\n')
-        for p in xz:
-            f.write('{0[0]} {0[1]} {0[2]}\n'.format(p.get()))
+        f.write(str(xz))
         f.write('\nyz\n')
-        for p in yz:
-            f.write('{0[0]} {0[1]} {0[2]}\n'.format(p.get()))
+        f.write(str(yz))
         f.write('\n')
 
