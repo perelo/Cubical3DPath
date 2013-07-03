@@ -13,6 +13,38 @@ from geom import *
 import util
 
 
+class Intervals:
+
+    def __init__(self):
+        self.data = []      # list of tuples (list of data, type, r, g, b)
+        self.init_data()
+
+
+    def init_data(self, interval3D=None):
+        p_min = Point3D(5, 5, 5)
+        p_max = Point3D(15, 15, 15)
+        step = 2
+
+        self.interval3D = Interval3D.generate_random_3D(p_min, p_max, step) \
+                                if not interval3D else interval3D
+
+        self.data = [(util.flat_segments(self.interval3D.segments), GL_LINES, 1, 1, 1)]
+
+        for proj in self.interval3D.get_projected_segments():
+            self.data.append((util.flat_segments(proj), GL_LINES, 1, 0, 0))
+
+
+    @staticmethod
+    def write_2d_intervals(f, xy, xz, yz):
+        f.write('xy\n')
+        f.write(str(xy))
+        f.write('\nxz\n')
+        f.write(str(xz))
+        f.write('\nyz\n')
+        f.write(str(yz))
+        f.write('\n')
+
+
 class Interval2D:
 
     def __init__(self, points=[]):
@@ -219,36 +251,4 @@ class Interval3D:
                     left_ray = not left_ray
 
         return right_ray == left_ray and right_ray
-
-
-class Intervals:
-
-    def __init__(self):
-        self.data = []      # list of tuples (list of data, type, r, g, b)
-        self.init_data()
-
-
-    def init_data(self, interval3D=None):
-        p_min = Point3D(5, 5, 5)
-        p_max = Point3D(15, 15, 15)
-        step = 1
-
-        self.interval3D = Interval3D.generate_random_3D(p_min, p_max, step) \
-                                if not interval3D else interval3D
-
-        self.data = [(util.flat_segments(self.interval3D.segments), GL_LINES, 1, 1, 1)]
-
-        for proj in self.interval3D.get_projected_segments():
-            self.data.append((util.flat_segments(proj), GL_LINES, 1, 0, 0))
-
-
-    @staticmethod
-    def write_2d_intervals(f, xy, xz, yz):
-        f.write('xy\n')
-        f.write(str(xy))
-        f.write('\nxz\n')
-        f.write(str(xz))
-        f.write('\nyz\n')
-        f.write(str(yz))
-        f.write('\n')
 
