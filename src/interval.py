@@ -8,7 +8,6 @@ __author__ = 'Eloi Perdereau'
 __date__ = '17-06-2013'
 
 
-import numpy as np
 from OpenGL.GL import *     # types : GL_POINTS, GL_LINES, ...
 from geom import *
 import util
@@ -113,9 +112,9 @@ class Interval3D:
     @staticmethod
     def _points3d_from_projection(p_min, p_max, xy, xz, yz, step_size):
         points = []
-        for x in np.arange(p_min.x(), p_max.x() + step_size, step_size):
-            for y in np.arange(p_min.y(), p_max.y() + step_size, step_size):
-                for z in np.arange(p_min.z(), p_max.z() + step_size, step_size):
+        for x in range(p_min.x(), p_max.x() + step_size, step_size):
+            for y in range(p_min.y(), p_max.y() + step_size, step_size):
+                for z in range(p_min.z(), p_max.z() + step_size, step_size):
                     p = Point3D(x, y, z)
                     if Interval3D._is_in(p, xy, Point3D.x, Point3D.y) and \
                        Interval3D._is_in(p, xz, Point3D.z, Point3D.x) and \
