@@ -29,7 +29,7 @@ class CanevasGLWidget(QGLWidget):
         self.camera.setSceneRadius(20)
         self.camera.reset()
         self.oldx = self.oldy = 0
-        self.model = Interval()
+        self.model = Intervals()
 
 
     def paintGL(self):
