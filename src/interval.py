@@ -24,7 +24,7 @@ class Interval2D:
 
 
     @staticmethod
-    def generate_random_2D(p_min, p_max, step_size = 1):
+    def generate_random_2D(p_min, p_max, step_size):
         from random import randrange
 
         xMin = p_min.x()
