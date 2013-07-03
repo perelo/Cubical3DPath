@@ -36,7 +36,7 @@ class Interval2D:
             return []
 
         lower_line = [Point2D(xMin, yMin)]
-        upper_line = [Point2D(xMin, randrange(yMin+1, yMax+1, step_size))]
+        upper_line = [Point2D(xMin, randrange(yMin+step_size, yMax+step_size, step_size))]
 
         old_low  = lower_line[0].y()
         old_high = upper_line[0].y()
@@ -48,8 +48,8 @@ class Interval2D:
         for i in range(xMin+step_size, xMax, step_size):
             if not lower_line_done:
                 # min: old_low to keep lower_line going up
-                # max: old_high+1 to prevent vertical overlap
-                low = randrange(old_low, old_high+1, step_size)
+                # max: old_high+step_size to prevent vertical overlap
+                low = randrange(old_low, old_high+step_size, step_size)
                 if low >= yMax:
                     lower_line_done = True
                 elif old_low < low: # old_low cannot be greater than low
@@ -60,9 +60,9 @@ class Interval2D:
 
             if not upper_line_done:
                 # min: low to prevent crossing + inc to prevent horizontal overlap
-                # max: yMax+1 to reach yMax but not go further
-                inc = 1 if not lower_line_done else 0
-                high = randrange(max(low+inc, old_high), yMax+1, step_size)
+                # max: yMax+step_size to reach yMax but not go further
+                inc = step_size if not lower_line_done else 0
+                high = randrange(max(low+inc, old_high), yMax+step_size, step_size)
                 if old_high < high:
                     # add points to make the upper_line rectilinear
                     upper_line.append(Point2D(i, old_high))
@@ -175,15 +175,15 @@ class Interval3D:
 
     @staticmethod
     def _is_eligible(points, p, step, x, y, z, create_point):
-        up    = create_point(x(p), y(p)+1, z(p)  ) in points
-        down  = create_point(x(p), y(p)-1, z(p)  ) in points
-        front = create_point(x(p), y(p)  , z(p)+1) in points
-        back  = create_point(x(p), y(p)  , z(p)-1) in points
+        up    = create_point(x(p), y(p)+step, z(p)  ) in points
+        down  = create_point(x(p), y(p)-step, z(p)  ) in points
+        front = create_point(x(p), y(p)  , z(p)+step) in points
+        back  = create_point(x(p), y(p)  , z(p)-step) in points
 
         if (up and down) or (front and back):
             # detect convex edges
-            up_back    = create_point(x(p), y(p)+1, z(p)-1) in points
-            down_front = create_point(x(p), y(p)-1, z(p)+1) in points
+            up_back    = create_point(x(p), y(p)+step, z(p)-step) in points
+            down_front = create_point(x(p), y(p)-step, z(p)+step) in points
             if up and down:
                 return (back and not up_back) or (front and not down_front)
             else: # front and back
