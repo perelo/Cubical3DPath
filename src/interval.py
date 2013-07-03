@@ -224,16 +224,17 @@ class Intervals:
         self.init_data()
 
 
-    def init_data(self, intervals = None):
+    def init_data(self, interval3D=None):
         p_min = Point3D(5, 5, 5)
         p_max = Point3D(15, 15, 15)
         step_size = 1
 
-        interval3D = Interval3D.generate_random_3D(p_min, p_max, step_size)
+        self.interval3D = Interval3D.generate_random_3D(p_min, p_max, step_size) \
+                                if not interval3D else interval3D
 
-        self.data = [(util.flat_segments(interval3D.segments), GL_LINES, 1, 1, 1)]
+        self.data = [(util.flat_segments(self.interval3D.segments), GL_LINES, 1, 1, 1)]
 
-        for proj in interval3D.get_projected_segments():
+        for proj in self.interval3D.get_projected_segments():
             self.data.append((util.flat_segments(proj), GL_LINES, 1, 0, 0))
 
 
