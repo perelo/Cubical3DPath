@@ -24,7 +24,7 @@ class Interval2D:
 
 
     @staticmethod
-    def generate_random_2D(p_min, p_max, step_size):
+    def generate_random_2D(p_min, p_max, step):
         from random import randrange
 
         xMin = p_min.x()
@@ -36,7 +36,7 @@ class Interval2D:
             return []
 
         lower_line = [Point2D(xMin, yMin)]
-        upper_line = [Point2D(xMin, randrange(yMin+step_size, yMax+step_size, step_size))]
+        upper_line = [Point2D(xMin, randrange(yMin+step, yMax+step, step))]
 
         old_low  = lower_line[0].y()
         old_high = upper_line[0].y()
@@ -45,11 +45,11 @@ class Interval2D:
         # for each step, pick a low and a high y coordinate
         # for lower and higher line respectively. Pick them right!
         lower_line_done = upper_line_done = False
-        for i in range(xMin+step_size, xMax, step_size):
+        for i in range(xMin+step, xMax, step):
             if not lower_line_done:
                 # min: old_low to keep lower_line going up
-                # max: old_high+step_size to prevent vertical overlap
-                low = randrange(old_low, old_high+step_size, step_size)
+                # max: old_high+step to prevent vertical overlap
+                low = randrange(old_low, old_high+step, step)
                 if low >= yMax:
                     lower_line_done = True
                 elif old_low < low: # old_low cannot be greater than low
@@ -60,9 +60,9 @@ class Interval2D:
 
             if not upper_line_done:
                 # min: low to prevent crossing + inc to prevent horizontal overlap
-                # max: yMax+step_size to reach yMax but not go further
-                inc = step_size if not lower_line_done else 0
-                high = randrange(max(low+inc, old_high), yMax+step_size, step_size)
+                # max: yMax+step to reach yMax but not go further
+                inc = step if not lower_line_done else 0
+                high = randrange(max(low+inc, old_high), yMax+step, step)
                 if old_high < high:
                     # add points to make the upper_line rectilinear
                     upper_line.append(Point2D(i, old_high))
@@ -96,11 +96,11 @@ class Interval3D:
 
 
     @staticmethod
-    def generate_random_3D(p_min, p_max, step_size):
+    def generate_random_3D(p_min, p_max, step):
         # generate three random 2D intervals
-        xy = Interval2D.generate_random_2D(p_min, p_max, step_size)
-        xz = Interval2D.generate_random_2D(p_min, p_max, step_size)
-        yz = Interval2D.generate_random_2D(p_min, p_max, step_size)
+        xy = Interval2D.generate_random_2D(p_min, p_max, step)
+        xz = Interval2D.generate_random_2D(p_min, p_max, step)
+        yz = Interval2D.generate_random_2D(p_min, p_max, step)
 
         # convert in 3D as projections
         xy = [Point3D(p2D.x(), p2D.y(), 0) for p2D in xy.points]
@@ -108,17 +108,17 @@ class Interval3D:
         yz = [Point3D(0, p2D.y(), p2D.x()) for p2D in yz.points]
 
         # reconstruct the volume
-        points = Interval3D._points3d_from_projection(p_min, p_max, xy, xz, yz, step_size)
-        segments = Interval3D._extract_skeleton(points, step_size)
+        points = Interval3D._points3d_from_projection(p_min, p_max, xy, xz, yz, step)
+        segments = Interval3D._extract_skeleton(points, step)
         return Interval3D(segments)
 
 
     @staticmethod
-    def _points3d_from_projection(p_min, p_max, xy, xz, yz, step_size):
+    def _points3d_from_projection(p_min, p_max, xy, xz, yz, step):
         points = []
-        for x in range(p_min.x(), p_max.x() + step_size, step_size):
-            for y in range(p_min.y(), p_max.y() + step_size, step_size):
-                for z in range(p_min.z(), p_max.z() + step_size, step_size):
+        for x in range(p_min.x(), p_max.x() + step, step):
+            for y in range(p_min.y(), p_max.y() + step, step):
+                for z in range(p_min.z(), p_max.z() + step, step):
                     p = Point3D(x, y, z)
                     if Interval3D._is_in(p, xy, Point3D.x, Point3D.y) and \
                        Interval3D._is_in(p, xz, Point3D.z, Point3D.x) and \
@@ -129,7 +129,7 @@ class Interval3D:
 
 
     @staticmethod
-    def _extract_skeleton(points, step_size):
+    def _extract_skeleton(points, step):
         skeleton = []
 
         get_zyx = lambda p: (p.z(), p.y(), p.x())
@@ -137,15 +137,15 @@ class Interval3D:
         get_zxy = lambda p: (p.z(), p.x(), p.y())
 
         create_point_xyz = lambda x, y, z: Point3D(x, y, z)
-        skeleton.extend(Interval3D._get_edges(sorted(points, key=get_zyx), step_size,
+        skeleton.extend(Interval3D._get_edges(sorted(points, key=get_zyx), step,
                                            Point3D.x, Point3D.y, Point3D.z, create_point_xyz))
 
         create_point_zyx = lambda x, y, z: Point3D(z, y, x)
-        skeleton.extend(Interval3D._get_edges(sorted(points, key=get_xyz), step_size,
+        skeleton.extend(Interval3D._get_edges(sorted(points, key=get_xyz), step,
                                            Point3D.z, Point3D.y, Point3D.x, create_point_zyx))
 
         create_point_yxz = lambda x, y, z: Point3D(y, x, z)
-        skeleton.extend(Interval3D._get_edges(sorted(points, key=get_zxy), step_size,
+        skeleton.extend(Interval3D._get_edges(sorted(points, key=get_zxy), step,
                                            Point3D.y, Point3D.x, Point3D.z, create_point_yxz))
 
         return skeleton
@@ -231,9 +231,9 @@ class Intervals:
     def init_data(self, interval3D=None):
         p_min = Point3D(5, 5, 5)
         p_max = Point3D(15, 15, 15)
-        step_size = 1
+        step = 1
 
-        self.interval3D = Interval3D.generate_random_3D(p_min, p_max, step_size) \
+        self.interval3D = Interval3D.generate_random_3D(p_min, p_max, step) \
                                 if not interval3D else interval3D
 
         self.data = [(util.flat_segments(self.interval3D.segments), GL_LINES, 1, 1, 1)]
