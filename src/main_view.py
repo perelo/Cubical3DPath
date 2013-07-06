@@ -45,6 +45,9 @@ class MainWindow(QtGui.QMainWindow):
         chk_draw_axis.setChecked(self.canevas.draw_axis)
         chk_draw_axis.stateChanged.connect(self.chk_draw_axis_action)
 
+        chk_draw_projs = QtGui.QCheckBox("Draw projs")
+        chk_draw_projs.stateChanged.connect(self.chk_draw_projs_action)
+
         # Place the buttons
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(btn_reset)
@@ -52,6 +55,7 @@ class MainWindow(QtGui.QMainWindow):
         vbox.addWidget(btn_save)
         vbox.addWidget(btn_load)
         vbox.addWidget(chk_draw_axis)
+        vbox.addWidget(chk_draw_projs)
         vbox.addStretch(1)
 
         # Place main components
@@ -92,6 +96,12 @@ class MainWindow(QtGui.QMainWindow):
     def chk_draw_axis_action(self, state):
         self.canevas.draw_axis = (state == QtCore.Qt.Checked)
         self.canevas.update()
+
+    def chk_draw_projs_action(self, state):
+        if state == QtCore.Qt.Checked:
+            self.canevas.model.add_projections()
+        else:
+            self.canevas.model.remove_projections()
 
 
 if __name__ == '__main__':

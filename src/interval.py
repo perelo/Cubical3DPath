@@ -30,8 +30,19 @@ class Intervals:
 
         self.data = [(util.flat_segments(self.interval3D.segments), GL_LINES, 1, 1, 1)]
 
+        self.proj_tuples = []
         for proj in self.interval3D.get_projected_segments():
-            self.data.append((util.flat_segments(proj), GL_LINES, 1, 0, 0))
+            self.proj_tuples.append((util.flat_segments(proj), GL_LINES, 1, 0, 0))
+
+
+    def add_projections(self):
+        if self.proj_tuples not in self.data:
+            self.data.extend(self.proj_tuples)
+
+    def remove_projections(self):
+        if self.proj_tuples[0] in self.data:
+            for t in self.proj_tuples:
+                self.data.remove(t)
 
 
     @staticmethod
