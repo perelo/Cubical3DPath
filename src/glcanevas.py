@@ -30,6 +30,7 @@ class CanevasGLWidget(QGLWidget):
         self.camera.reset()
         self.oldx = self.oldy = 0
         self.model = Intervals()
+        self.draw_axis = True
 
 
     def paintGL(self):
@@ -55,22 +56,23 @@ class CanevasGLWidget(QGLWidget):
             glDrawArrays(gl_type, 0, len(array))
         glDisableClientState(GL_VERTEX_ARRAY)
 
-        # Draw axis
-        glColor(1.0, 0.0, 0.0)
-        glBegin(GL_LINES)
-        glVertex( 0, 0, 0)
-        glVertex(10, 0, 0)
-        glEnd()
-        glColor(0.0, 1.0, 0.0)
-        glBegin(GL_LINES)
-        glVertex( 0, 0, 0)
-        glVertex( 0,10, 0)
-        glEnd()
-        glColor(0.0, 0.0, 1.0)
-        glBegin(GL_LINES)
-        glVertex( 0, 0, 0)
-        glVertex( 0, 0,10)
-        glEnd()
+        if self.draw_axis:
+            # Draw axis
+            glColor(1.0, 0.0, 0.0)
+            glBegin(GL_LINES)
+            glVertex( 0, 0, 0)
+            glVertex(10, 0, 0)
+            glEnd()
+            glColor(0.0, 1.0, 0.0)
+            glBegin(GL_LINES)
+            glVertex( 0, 0, 0)
+            glVertex( 0,10, 0)
+            glEnd()
+            glColor(0.0, 0.0, 1.0)
+            glBegin(GL_LINES)
+            glVertex( 0, 0, 0)
+            glVertex( 0, 0,10)
+            glEnd()
 
         glFlush()
 

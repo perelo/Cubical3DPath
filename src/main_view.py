@@ -41,12 +41,17 @@ class MainWindow(QtGui.QMainWindow):
         btn_load = QtGui.QPushButton("Load")
         self.connect(btn_load, QtCore.SIGNAL('clicked()'), self.btn_load_action)
 
+        chk_draw_axis = QtGui.QCheckBox("Draw axis")
+        chk_draw_axis.setChecked(self.canevas.draw_axis)
+        chk_draw_axis.stateChanged.connect(self.chk_draw_axis_action)
+
         # Place the buttons
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(btn_reset)
         vbox.addWidget(btn_generate)
         vbox.addWidget(btn_save)
         vbox.addWidget(btn_load)
+        vbox.addWidget(chk_draw_axis)
         vbox.addStretch(1)
 
         # Place main components
@@ -83,6 +88,10 @@ class MainWindow(QtGui.QMainWindow):
             f = open(file_name, 'r')
             self.canevas.load_data(f)
             f.close()
+
+    def chk_draw_axis_action(self, state):
+        self.canevas.draw_axis = (state == QtCore.Qt.Checked)
+        self.canevas.update()
 
 
 if __name__ == '__main__':
