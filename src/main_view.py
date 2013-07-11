@@ -45,8 +45,8 @@ class MainWindow(QtGui.QMainWindow):
         chk_draw_axis.setChecked(self.canevas.draw_axis)
         chk_draw_axis.stateChanged.connect(self.chk_draw_axis_action)
 
-        chk_draw_projs = QtGui.QCheckBox("Draw projs")
-        chk_draw_projs.stateChanged.connect(self.chk_draw_projs_action)
+        self.chk_draw_projs = QtGui.QCheckBox("Draw projs")
+        self.chk_draw_projs.stateChanged.connect(self.chk_draw_projs_action)
 
         # Place the buttons
         vbox = QtGui.QVBoxLayout()
@@ -55,7 +55,7 @@ class MainWindow(QtGui.QMainWindow):
         vbox.addWidget(btn_save)
         vbox.addWidget(btn_load)
         vbox.addWidget(chk_draw_axis)
-        vbox.addWidget(chk_draw_projs)
+        vbox.addWidget(self.chk_draw_projs)
         vbox.addStretch(1)
 
         # Place main components
@@ -77,6 +77,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def btn_generate_action(self):
         self.canevas.model.init_data()
+        self.chk_draw_projs_action(self.chk_draw_projs.checkState())
         self.canevas.update()
 
     def btn_save_action(self):
