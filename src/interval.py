@@ -209,29 +209,46 @@ class Interval3D:
                 z_ref = z(q)
                 continue
 
-            if Interval3D._is_eligible(points, p, step, x, y, z, create_point) or \
-               Interval3D._is_eligible(points, q, step, x, y, z, create_point):
+            if Interval3D._edge_eligible(points, (p,q), step, x, y, z, create_point):
                 edges.append((i, i+1))
 
         return [Segment3D(points[a], points[b]) for a, b in edges]
 
 
     @staticmethod
-    def _is_eligible(points, p, step, x, y, z, create_point):
-        up    = create_point(x(p), y(p)+step, z(p)  ) in points
-        down  = create_point(x(p), y(p)-step, z(p)  ) in points
-        front = create_point(x(p), y(p)  , z(p)+step) in points
-        back  = create_point(x(p), y(p)  , z(p)-step) in points
+    def _edge_eligible(points, e, step, x, y, z, create_point, first=True):
+        p, q = e
+        p_up    = create_point(x(p), y(p)+step, z(p)     ) in points
+        p_down  = create_point(x(p), y(p)-step, z(p)     ) in points
+        p_front = create_point(x(p), y(p)  ,    z(p)+step) in points
+        p_back  = create_point(x(p), y(p)  ,    z(p)-step) in points
+        q_up    = create_point(x(q), y(q)+step, z(q)     ) in points
+        q_down  = create_point(x(q), y(q)-step, z(q)     ) in points
+        q_front = create_point(x(q), y(q)  ,    z(q)+step) in points
+        q_back  = create_point(x(q), y(q)  ,    z(q)-step) in points
 
-        if (up and down) or (front and back):
-            # detect convex edges
-            up_back    = create_point(x(p), y(p)+step, z(p)-step) in points
-            down_front = create_point(x(p), y(p)-step, z(p)+step) in points
-            if up and down:
-                return (back and not up_back) or (front and not down_front)
-            else: # front and back
-                return (up and not up_back) or (down and not down_front)
+        if (p_up and p_down) or (p_front and p_back) or \
+           (q_up and q_down) or (q_front and q_back):
+            # check for concaveness
 
+            p_up_back    = create_point(x(p), y(p)+step, z(p)-step) in points
+            p_up_front   = create_point(x(p), y(p)+step, z(p)+step) in points
+            p_down_front = create_point(x(p), y(p)-step, z(p)+step) in points
+            p_down_back  = create_point(x(p), y(p)-step, z(p)-step) in points
+            q_up_back    = create_point(x(q), y(q)+step, z(q)-step) in points
+            q_up_front   = create_point(x(q), y(q)+step, z(q)+step) in points
+            q_down_front = create_point(x(q), y(q)-step, z(q)+step) in points
+            q_down_back  = create_point(x(q), y(q)-step, z(q)-step) in points
+
+            if (p_up and p_down) and (q_up and q_down):
+                return (p_back  and q_back  and not p_up_back    and not q_up_back) or \
+                       (p_front and q_front and not p_down_front and not q_down_front)
+
+            elif (p_front and p_back) and (q_front and q_back):
+                return (p_up   and q_up   and not p_up_back    and not q_up_back) or \
+                       (p_down and q_down and not p_down_front and not q_down_front)
+
+        # convex
         return True
 
 
