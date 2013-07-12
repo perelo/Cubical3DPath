@@ -27,6 +27,13 @@ def generate_interval2D(p_min, p_max, step):
     lower_line = [Point2D(xMin, yMin)]
     upper_line = [Point2D(xMin, randrange(yMin+step, yMax+step, step))]
 
+    # list of tuples representing "squares" within the interval
+    # they are used to find in O(log(n)) if a point is inside the interval
+    squares = []
+
+    square_low = p_min      # bottom left point of current square
+    square_up  = None       # upper right point of current square
+
     old_low  = lower_line[0].y()
     old_high = upper_line[0].y()
 
@@ -45,6 +52,7 @@ def generate_interval2D(p_min, p_max, step):
                 # add points to make the lower_line rectilinear
                 lower_line.append(Point2D(i, old_low))
                 lower_line.append(Point2D(i, low))
+                square_up = Point2D(i, old_high)
                 old_low = low
 
         if not upper_line_done:
@@ -56,16 +64,24 @@ def generate_interval2D(p_min, p_max, step):
                 # add points to make the upper_line rectilinear
                 upper_line.append(Point2D(i, old_high))
                 upper_line.append(Point2D(i, high))
+                square_up = Point2D(i, old_high)
                 old_high = high
             if high >= yMax:
                 upper_line_done = True
+
+        if square_up:
+            squares.append((square_low,square_up))
+            square_low = Point2D(i, old_low)
+            square_up = None
+
+    squares.append((square_low, p_max))
 
     upper_line.append(Point2D(xMax, yMax))
     lower_line.append(Point2D(xMax, old_low))
 
     upper_line.reverse()
     lower_line.extend(upper_line)
-    return interval.Interval2D(lower_line)
+    return interval.Interval2D(lower_line, squares)
 
 
 def generate_interval3D(p_min, p_max, step):

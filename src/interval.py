@@ -60,8 +60,9 @@ class Intervals:
 
 class Interval2D:
 
-    def __init__(self, points=[]):
+    def __init__(self, points=[], squares=[]):
         self.points = points
+        self.squares = squares
 
     def __str__(self):
         return '\n'.join(' '.join(str(coord) for coord in p.get()) for p in self.points)
