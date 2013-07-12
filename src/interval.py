@@ -212,7 +212,8 @@ class Interval3D:
             if Interval3D._edge_eligible(points, (p,q), step, x, y, z, create_point):
                 edges.append((i, i+1))
 
-        return [Segment3D(points[a], points[b]) for a, b in edges]
+        edges = Interval3D._extend_adjacent_edges([(points[a], points[b]) for a, b in edges])
+        return [Segment3D(p, q) for p, q in edges]
 
 
     @staticmethod
@@ -250,6 +251,26 @@ class Interval3D:
 
         # convex
         return True
+
+
+    @staticmethod
+    def _extend_adjacent_edges(edges):
+        merged_edges = []
+        first = ()
+        streak = False
+        for i in range(len(edges)-1):
+            e1 = edges[i  ]
+            e2 = edges[i+1]
+            if e1[1] == e2[0]:
+                if not streak:
+                    first = e1
+                    streak = True
+            else:
+                merged_edges.append((first[0], e1[1]) if streak else e1)
+                streak = False
+
+        merged_edges.append((first[0], edges[-1][1]) if streak else edges[-1])
+        return merged_edges
 
 
     @staticmethod
