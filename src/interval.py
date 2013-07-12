@@ -36,6 +36,26 @@ class Intervals:
         for proj in self.interval3D.get_projected_segments():
             self.proj_tuples.append((util.flat_segments(proj), GL_LINES, 1, 0, 0))
 
+        #self.interval2D = gen.generate_interval2D(p_min, p_max, step)
+        #border_pts = [(p.x(), p.y(), 0) for p in self.interval2D.points]
+        #self.data = [(border_pts, GL_LINE_LOOP, 1, 0, 0)]
+
+        #all_pts = []
+        #step = 1
+        #for x in xrange(p_min.x(), p_max.x()+step, step):
+            #for y in xrange(p_min.y(), p_max.y()+step, step):
+                #p = Point3D(x,y,0)
+                #if p in self.interval2D:
+                    #all_pts.append(p)
+
+        #self.data.append((util.flat_points(all_pts), GL_POINTS, 1, 1, 1))
+
+        #squares = self.interval2D.squares
+        #print squares
+        #squares = [((p.x(), p.y(), 0), (q.x(), q.y(), 0)) for p, q in self.interval2D.squares]
+        #squares = [t for s in squares for t in s]
+        #self.data.append((squares, GL_LINES, 1, 0, 1))
+
 
     def add_projections(self):
         if self.proj_tuples not in self.data:
@@ -68,6 +88,32 @@ class Interval2D:
         return '\n'.join(' '.join(str(coord) for coord in p.get()) for p in self.points)
 
     def __contains__(self, point):
+        if not isinstance(point, (Point2D, Point3D)):
+            return False
+        else:
+            return self._contains_binary_search(point) if self.squares else \
+                   self._contains_ray_throwing (point)
+
+
+    def _contains_binary_search(self, point, imin=None, imax=None):
+        imin = imin if imin else 0
+        imax = imax if imax else len(self.squares)
+
+        if imin >= imax:
+            return False
+
+        imid = (imin + imax) / 2
+        low, high = self.squares[imid]
+
+        if low.x() > point.x() or low.y() > point.y():      #left or down
+            return self._contains_binary_search(point, imin, imid)
+        elif high.x() < point.x() or high.y() < point.y():  # right or up
+            return self._contains_binary_search(point, imid+1, imax)
+        else: # inside
+            return True
+
+
+    def _contains_ray_throwing(self, point):
         # throw two rays horizontally in both ways
         # right_ray and left_ray tells if they cross an odd number of segments
         # we need both ways because there are some cases (e.g upper horizontal line)
@@ -92,7 +138,6 @@ class Interval2D:
                     left_ray = not left_ray
 
         return right_ray == left_ray and right_ray
-
 
 
 class Interval3D:
