@@ -90,27 +90,21 @@ def generate_interval3D(p_min, p_max, step):
     xz = generate_interval2D(p_min, p_max, step)
     yz = generate_interval2D(p_min, p_max, step)
 
-    # convert in 3D as projections
-    xy = [Point3D(p2D.x(), p2D.y(), 0) for p2D in xy.points]
-    xz = [Point3D(p2D.y(), 0, p2D.x()) for p2D in xz.points]
-    yz = [Point3D(0, p2D.y(), p2D.x()) for p2D in yz.points]
-
     # reconstruct the volume
-    points = _points3d_from_projection(p_min, p_max, xy, xz, yz, step)
+    points = _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step)
     segments = _extract_skeleton(points, step)
     return interval.Interval3D(segments)
 
 
-def _points3d_from_projection(p_min, p_max, xy, xz, yz, step):
+def _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step):
     points = []
     for x in range(p_min.x(), p_max.x() + step, step):
         for y in range(p_min.y(), p_max.y() + step, step):
             for z in range(p_min.z(), p_max.z() + step, step):
-                p = Point3D(x, y, z)
-                if _is_in(p, xy, Point3D.x, Point3D.y) and \
-                   _is_in(p, xz, Point3D.z, Point3D.x) and \
-                   _is_in(p, yz, Point3D.z, Point3D.y):
-                    points.append(p)
+                if Point2D(x, y) in xy and \
+                   Point2D(x, z) in xz and \
+                   Point2D(y, z) in xz:
+                    points.append(Point3D(x, y, z))
 
     return points
 
@@ -212,30 +206,3 @@ def _extend_adjacent_edges(edges):
     merged_edges.append((first[0], edges[-1][1]) if streak else edges[-1])
     return merged_edges
 
-
-def _is_in(point, polygon, x, y, close = True):
-    # throw two rays horizontally in both ways
-    # right_ray and left_ray tells if they cross an odd number of segments
-    # we need both ways because there are some cases (e.g upper horizontal line)
-    # where right_ray is odd and left_ray is zero
-    sz = len(polygon)
-    right_ray = left_ray = False
-    for i in range(sz):
-        p1, p2 = polygon[i], polygon[(i+1)%sz]
-
-        if y(p1) <= y(point) <= y(p2) or \
-           y(p1) >= y(point) >= y(p2):
-
-            if close:
-                # test if point is in the line segment [p1, p2]
-                if (x(p1) <= x(point) <= x(p2) or \
-                    x(p1) >= x(point) >= x(p2)) and \
-                   ((x(point)-x(p1))*(y(p2)-y(point)) == (x(p2)-x(point))*(y(point)-y(p1))):
-                   return True
-
-            if x(point) <= min((x(p1), x(p2))):
-                right_ray = not right_ray
-            if x(point) >= max((x(p1), x(p2))):
-                left_ray = not left_ray
-
-    return right_ray == left_ray and right_ray
