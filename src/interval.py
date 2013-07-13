@@ -23,6 +23,7 @@ class Intervals(object):
 
 
     def init_data(self, interval3D=None):
+        self.data = []
         p_min = Point3D(5, 5, 5)
         p_max = Point3D(15, 15, 15)
         step = 2
@@ -30,31 +31,20 @@ class Intervals(object):
         self.interval3D = gen.generate_interval3D(p_min, p_max, step) \
                                 if not interval3D else interval3D
 
-        self.data = [(util.flat_segments(self.interval3D.segments), GL_LINES, 1, 1, 1)]
+        #self.data = [(util.flat_segments(self.interval3D.segments), GL_LINES, 1, 1, 1)]
+
+        convex_edges  = []
+        concave_edges = []
+        for s in self.interval3D.segments:
+            edges = convex_edges if s.type == Edge3D.CONVEX else concave_edges
+            edges.append(s)
+
+        self.data.append((util.flat_segments(convex_edges ), GL_LINES, 1, 1, 1))
+        self.data.append((util.flat_segments(concave_edges), GL_LINES, 1, 1, 0))
 
         self.proj_tuples = []
         for proj in self.interval3D.get_projected_segments():
             self.proj_tuples.append((util.flat_segments(proj), GL_LINES, 1, 0, 0))
-
-        #self.interval2D = gen.generate_interval2D(p_min, p_max, step)
-        #border_pts = [(p.x(), p.y(), 0) for p in self.interval2D.points]
-        #self.data = [(border_pts, GL_LINE_LOOP, 1, 0, 0)]
-
-        #all_pts = []
-        #step = 1
-        #for x in xrange(p_min.x(), p_max.x()+step, step):
-            #for y in xrange(p_min.y(), p_max.y()+step, step):
-                #p = Point3D(x,y,0)
-                #if p in self.interval2D:
-                    #all_pts.append(p)
-
-        #self.data.append((util.flat_points(all_pts), GL_POINTS, 1, 1, 1))
-
-        #squares = self.interval2D.squares
-        #print squares
-        #squares = [((p.x(), p.y(), 0), (q.x(), q.y(), 0)) for p, q in self.interval2D.squares]
-        #squares = [t for s in squares for t in s]
-        #self.data.append((squares, GL_LINES, 1, 0, 1))
 
 
     def add_projections(self):
