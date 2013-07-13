@@ -89,6 +89,14 @@ class Segment3D(object):
     def flat(self):
         return [tuple(self.a.coordinates), tuple(self.b.coordinates)]
 
+class Edge3D(Segment3D):
+    # edge types
+    UNKNOWN = 0
+    CONVEX  = 1
+    CONCAVE = 2
+    def __init__(self,a=Point3D(),b=Point3D(),type=UNKNOWN):
+        super(Edge3D, self).__init__(a,b)
+        self.type = type
 
 class Vector3D(object):
     def __init__(self,x=0,y=0,z=0):

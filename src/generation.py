@@ -145,11 +145,12 @@ def _get_edges(points, step, x, y, z, create_point):
             z_ref = z(q)
             continue
 
-        if _edge_eligible(points, (p,q), step, x, y, z, create_point):
-            edges.append((i, i+1))
+        eligibility = _edge_eligible(points, (p,q), step, x, y, z, create_point)
+        if eligibility:
+            edges.append((i, i+1, eligibility))
 
-    edges = _extend_adjacent_edges([(points[a], points[b]) for a, b in edges])
-    return [Segment3D(p, q) for p, q in edges]
+    edges = _extend_adjacent_edges([(points[a], points[b], t) for a, b, t in edges])
+    return [Edge3D(p, q, t) for p, q, t in edges]
 
 
 def _edge_eligible(points, e, step, x, y, z, create_point, first=True):
@@ -177,15 +178,17 @@ def _edge_eligible(points, e, step, x, y, z, create_point, first=True):
         q_down_back  = create_point(x(q), y(q)-step, z(q)-step) in points
 
         if (p_up and p_down) and (q_up and q_down):
-            return (p_back  and q_back  and not p_up_back    and not q_up_back) or \
-                   (p_front and q_front and not p_down_front and not q_down_front)
+            b = (p_back  and q_back  and not p_up_back    and not q_up_back) or \
+                (p_front and q_front and not p_down_front and not q_down_front)
+            return 2 if b else 0
 
         elif (p_front and p_back) and (q_front and q_back):
-            return (p_up   and q_up   and not p_up_back    and not q_up_back) or \
-                   (p_down and q_down and not p_down_front and not q_down_front)
+            b = (p_up   and q_up   and not p_up_back    and not q_up_back) or \
+                (p_down and q_down and not p_down_front and not q_down_front)
+            return 2 if b else 0
 
     # convex
-    return True
+    return 1
 
 
 def _extend_adjacent_edges(edges):
@@ -195,14 +198,14 @@ def _extend_adjacent_edges(edges):
     for i in range(len(edges)-1):
         e1 = edges[i  ]
         e2 = edges[i+1]
-        if e1[1] == e2[0]:
+        if e1[1] == e2[0] and e1[2] == e2[2]:
             if not streak:
                 first = e1
                 streak = True
         else:
-            merged_edges.append((first[0], e1[1]) if streak else e1)
+            merged_edges.append((first[0], e1[1], first[2]) if streak else e1)
             streak = False
 
-    merged_edges.append((first[0], edges[-1][1]) if streak else edges[-1])
+    merged_edges.append((first[0], edges[-1][1], first[2]) if streak else edges[-1])
     return merged_edges
 
