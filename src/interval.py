@@ -15,7 +15,7 @@ from geom import *
 import util
 
 
-class Intervals:
+class Intervals(object):
 
     def __init__(self):
         self.data = []      # list of tuples (list of data, type, r, g, b)
@@ -78,7 +78,7 @@ class Intervals:
         f.write('\n')
 
 
-class Interval2D:
+class Interval2D(object):
 
     def __init__(self, points=[], squares=[]):
         self.points = points
@@ -140,7 +140,7 @@ class Interval2D:
         return right_ray == left_ray and right_ray
 
 
-class Interval3D:
+class Interval3D(object):
 
     def __init__(self, segments=[]):
         self.segments = segments

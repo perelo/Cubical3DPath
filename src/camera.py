@@ -16,7 +16,7 @@ from OpenGL.GLU import *
 from geom import *
 
 
-class Camera:
+class Camera(object):
     def __init__(self):
         self.FIELD_OF_VIEW_IN_DEGREES = 1.0
         self.ORBITING_SPEED_IN_DEGREES_PER_RADIUS_OF_VIEWPORT = 300.0

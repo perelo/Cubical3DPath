@@ -10,7 +10,7 @@ __date__ = '17-06-2013'
 
 import math
 
-class Point2D:
+class Point2D(object):
     def __init__(self,x=0,y=0):
         self.coordinates = [x,y]
     def x(self):
@@ -36,7 +36,7 @@ class Point2D:
     def __ne__(self,other):
         return not (self==other)
 
-class Point3D:
+class Point3D(object):
     def __init__(self,x=0,y=0,z=0):
         self.coordinates = [x,y,z]
     def x(self):
@@ -72,7 +72,7 @@ class Point3D:
     def __ne__(self,other):
         return not (self==other)
 
-class Segment3D:
+class Segment3D(object):
     def __init__(self,a=Point3D(),b=Point3D()):
         self.a = a
         self.b = b
@@ -90,7 +90,7 @@ class Segment3D:
         return [tuple(self.a.coordinates), tuple(self.b.coordinates)]
 
 
-class Vector3D:
+class Vector3D(object):
     def __init__(self,x=0,y=0,z=0):
         self.coordinates = [x,y,z]
     def x(self):
@@ -146,7 +146,7 @@ class Vector3D:
     def __ne__(self,other):
         return not (self==other)
 
-class Matrix4x4:
+class Matrix4x4(object):
     def __init__(self):
         self.setToIdentity()
     def __str__(self):
