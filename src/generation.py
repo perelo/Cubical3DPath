@@ -145,15 +145,15 @@ def _get_edges(points, step, x, y, z, create_point):
             z_ref = z(q)
             continue
 
-        eligibility = _edge_eligible(points, (p,q), step, x, y, z, create_point)
-        if eligibility:
-            edges.append((i, i+1, eligibility))
+        edge_type = _compute_edge_type(points, (p,q), step, x, y, z, create_point)
+        if edge_type != Edge3D.UNKNOWN:
+            edges.append((i, i+1, edge_type))
 
     edges = _extend_adjacent_edges([(points[a], points[b], t) for a, b, t in edges])
     return [Edge3D(p, q, t) for p, q, t in edges]
 
 
-def _edge_eligible(points, e, step, x, y, z, create_point, first=True):
+def _compute_edge_type(points, e, step, x, y, z, create_point, first=True):
     p, q = e
     p_up    = create_point(x(p), y(p)+step, z(p)     ) in points
     p_down  = create_point(x(p), y(p)-step, z(p)     ) in points
@@ -180,15 +180,15 @@ def _edge_eligible(points, e, step, x, y, z, create_point, first=True):
         if (p_up and p_down) and (q_up and q_down):
             b = (p_back  and q_back  and not p_up_back    and not q_up_back) or \
                 (p_front and q_front and not p_down_front and not q_down_front)
-            return 2 if b else 0
+            return Edge3D.CONCAVE if b else Edge3D.UNKNOWN
 
         elif (p_front and p_back) and (q_front and q_back):
             b = (p_up   and q_up   and not p_up_back    and not q_up_back) or \
                 (p_down and q_down and not p_down_front and not q_down_front)
-            return 2 if b else 0
+            return Edge3D.CONCAVE if b else Edge3D.UNKNOWN
 
     # convex
-    return 1
+    return Edge3D.CONVEX
 
 
 def _extend_adjacent_edges(edges):
