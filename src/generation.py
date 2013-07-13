@@ -147,10 +147,10 @@ def _get_edges(points, step, x, y, z, create_point):
 
         edge_type = _compute_edge_type(points, (p,q), step, x, y, z, create_point)
         if edge_type != Edge3D.UNKNOWN:
-            edges.append((i, i+1, edge_type))
+            edges.append(Edge3D(p, q, edge_type))
 
-    edges = _extend_adjacent_edges([(points[a], points[b], t) for a, b, t in edges])
-    return [Edge3D(p, q, t) for p, q, t in edges]
+    #edges = _extend_adjacent_edges([(points[a], points[b], t) for a, b, t in edges])
+    return _extend_adjacent_edges(edges)#[Edge3D(p, q, t) for p, q, t in edges]
 
 
 def _compute_edge_type(points, e, step, x, y, z, create_point, first=True):
@@ -198,14 +198,14 @@ def _extend_adjacent_edges(edges):
     for i in range(len(edges)-1):
         e1 = edges[i  ]
         e2 = edges[i+1]
-        if e1[1] == e2[0] and e1[2] == e2[2]:
+        if e1.b == e2.a and e1.type == e2.type:
             if not streak:
                 first = e1
                 streak = True
         else:
-            merged_edges.append((first[0], e1[1], first[2]) if streak else e1)
+            merged_edges.append(Edge3D(first.a, e1.b, first.type) if streak else e1)
             streak = False
 
-    merged_edges.append((first[0], edges[-1][1], first[2]) if streak else edges[-1])
+    merged_edges.append(Edge3D(first.a, edges[-1].b, first.type) if streak else edges[-1])
     return merged_edges
 
