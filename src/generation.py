@@ -112,18 +112,19 @@ def _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step):
 
 def _clean_flat_faces(points, step):
     length = 0
+    right = left = up = down = front = back = dict()
     while length != len(points):
         length = len(points)
         for p in points:
-            right  = Point3D(p.x()+step, p.y(),      p.z()     ) in points
-            left   = Point3D(p.x()-step, p.y(),      p.z()     ) in points
-            up     = Point3D(p.x(),      p.y()+step, p.z()     ) in points
-            down   = Point3D(p.x(),      p.y()-step, p.z()     ) in points
-            front  = Point3D(p.x(),      p.y(),      p.z()+step) in points
-            back   = Point3D(p.x(),      p.y(),      p.z()-step) in points
-            if (not up    and not down ) or \
-               (not front and not back ) or \
-               (not left  and not right):
+            has_right  = right.get(p, Point3D(p.x()+step, p.y(),      p.z()     ) in points)
+            has_left   = left .get(p, Point3D(p.x()-step, p.y(),      p.z()     ) in points)
+            has_up     = up   .get(p, Point3D(p.x(),      p.y()+step, p.z()     ) in points)
+            has_down   = down .get(p, Point3D(p.x(),      p.y()-step, p.z()     ) in points)
+            has_front  = front.get(p, Point3D(p.x(),      p.y(),      p.z()+step) in points)
+            has_back   = back .get(p, Point3D(p.x(),      p.y(),      p.z()-step) in points)
+            if (not has_up    and not has_down ) or \
+               (not has_front and not has_back ) or \
+               (not has_left  and not has_right):
                points.remove(p)
 
     return points
