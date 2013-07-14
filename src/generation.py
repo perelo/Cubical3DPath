@@ -92,6 +92,7 @@ def generate_interval3D(p_min, p_max, step):
 
     # reconstruct the volume
     points = _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step)
+    points = _clean_flat_faces(points, step)
     segments = _extract_skeleton(points, step)
     return interval.Interval3D(segments)
 
@@ -105,6 +106,25 @@ def _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step):
                    Point2D(x, z) in xz and \
                    Point2D(y, z) in yz:
                     points.append(Point3D(x, y, z))
+
+    return points
+
+
+def _clean_flat_faces(points, step):
+    length = 0
+    while length != len(points):
+        length = len(points)
+        for p in points:
+            right  = Point3D(p.x()+step, p.y(),      p.z()     ) in points
+            left   = Point3D(p.x()-step, p.y(),      p.z()     ) in points
+            up     = Point3D(p.x(),      p.y()+step, p.z()     ) in points
+            down   = Point3D(p.x(),      p.y()-step, p.z()     ) in points
+            front  = Point3D(p.x(),      p.y(),      p.z()+step) in points
+            back   = Point3D(p.x(),      p.y(),      p.z()-step) in points
+            if (not up    and not down ) or \
+               (not front and not back ) or \
+               (not left  and not right):
+               points.remove(p)
 
     return points
 
