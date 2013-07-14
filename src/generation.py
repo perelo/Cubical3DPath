@@ -103,7 +103,7 @@ def _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step):
             for z in range(p_min.z(), p_max.z() + step, step):
                 if Point2D(x, y) in xy and \
                    Point2D(x, z) in xz and \
-                   Point2D(y, z) in xz:
+                   Point2D(y, z) in yz:
                     points.append(Point3D(x, y, z))
 
     return points
