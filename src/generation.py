@@ -41,7 +41,7 @@ def generate_interval2D(p_min, p_max, step):
     # for each step, pick a low and a high y coordinate
     # for lower and higher line respectively. Pick them right!
     lower_line_done = upper_line_done = False
-    for i in range(xMin+step, xMax, step):
+    for i in xrange(xMin+step, xMax, step):
         if not lower_line_done:
             # min: old_low to keep lower_line going up
             # max: old_high+step to prevent vertical overlap
@@ -99,9 +99,9 @@ def generate_interval3D(p_min, p_max, step):
 
 def _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step):
     points = []
-    for x in range(p_min.x(), p_max.x() + step, step):
-        for y in range(p_min.y(), p_max.y() + step, step):
-            for z in range(p_min.z(), p_max.z() + step, step):
+    for x in xrange(p_min.x(), p_max.x() + step, step):
+        for y in xrange(p_min.y(), p_max.y() + step, step):
+            for z in xrange(p_min.z(), p_max.z() + step, step):
                 if Point2D(x, y) in xy and \
                    Point2D(x, z) in xz and \
                    Point2D(y, z) in yz:
@@ -157,7 +157,7 @@ def _get_edges(points, step, x, y, z, create_point):
 
     y_ref = y(points[0])
     z_ref = z(points[0])
-    for i in range(0, len(points)-1):
+    for i in xrange(len(points)-1):
         p = points[i  ]
         q = points[i+1]
 
@@ -216,7 +216,7 @@ def _extend_adjacent_edges(edges):
     merged_edges = []
     first = ()
     streak = False
-    for i in range(len(edges)-1):
+    for i in xrange(len(edges)-1):
         e1 = edges[i  ]
         e2 = edges[i+1]
         if e1.b == e2.a and e1.type == e2.type:

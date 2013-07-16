@@ -110,7 +110,7 @@ class Interval2D(object):
         # where right_ray is odd and left_ray is zero
         sz = len(self.points)
         right_ray = left_ray = False
-        for i in range(sz):
+        for i in xrange(sz):
             p1, p2 = self.points[i], self.points[(i+1)%sz]
 
             if p1.y() <= point.y() <= p2.y() or \
