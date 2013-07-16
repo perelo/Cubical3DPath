@@ -42,18 +42,19 @@ class Intervals(object):
         self.data.append((util.flat_segments(convex_edges ), GL_LINES, 1, 1, 1))
         self.data.append((util.flat_segments(concave_edges), GL_LINES, 1, 1, 0))
 
-        self.proj_tuples = []
-        for proj in self.interval3D.get_projected_segments():
-            self.proj_tuples.append((util.flat_segments(proj), GL_LINES, 1, 0, 0))
+        # interval2Ds (projections of Interval3D)
+        self.int2Ds = [self.interval3D.int_xz, self.interval3D.int_zy, self.interval3D.int_yx]
+        for i in xrange(len(self.int2Ds)):
+            self.int2Ds[i] = (util.flat_points(self.int2Ds[i].points), GL_LINE_LOOP, 1, 0, 0)
 
 
     def add_projections(self):
-        if self.proj_tuples not in self.data:
-            self.data.extend(self.proj_tuples)
+        if self.int2Ds not in self.data:
+            self.data.extend(self.int2Ds)
 
     def remove_projections(self):
-        if self.proj_tuples[0] in self.data:
-            for t in self.proj_tuples:
+        if self.int2Ds[0] in self.data:
+            for t in self.int2Ds:
                 self.data.remove(t)
 
 
@@ -140,13 +141,4 @@ class Interval3D(object):
         self.int_xz = int_xz
         self.int_zy = int_zy
         self.int_yx = int_yx
-
-    def get_projected_segments(self):
-        xy = [Segment3D(Point3D(e.a.x(), e.a.y(), 0), Point3D(e.b.x(), e.b.y(), 0))
-                                                        for e in self.segments if e.a.z() == e.b.z()]
-        xz = [Segment3D(Point3D(e.a.x(), 0, e.a.z()), Point3D(e.b.x(), 0, e.b.z()))
-                                                        for e in self.segments if e.a.y() == e.b.y()]
-        yz = [Segment3D(Point3D(0, e.a.y(), e.a.z()), Point3D(0, e.b.y(), e.b.z()))
-                                                        for e in self.segments if e.a.x() == e.b.x()]
-        return (xy, xz, yz)
 
