@@ -53,8 +53,8 @@ class Intervals(object):
             self.data.extend(self.int2Ds)
 
     def remove_projections(self):
-        if self.int2Ds[0] in self.data:
-            for t in self.int2Ds:
+        for t in self.int2Ds:
+            if t in self.data:
                 self.data.remove(t)
 
 
