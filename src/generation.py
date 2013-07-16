@@ -97,17 +97,17 @@ def generate_interval3D(p_min, p_max, step):
     # extract the skeleton from the points
     skeleton = []
 
-    get_zyx = lambda p: (p.z(), p.y(), p.x())
+    get_yzx = lambda p: (p.y(), p.z(), p.x())
     get_xyz = lambda p: (p.x(), p.y(), p.z())
     get_zxy = lambda p: (p.z(), p.x(), p.y())
 
-    create_point_xyz = lambda x, y, z: Point3D(x, y, z)
+    create_point_xzy = lambda x, y, z: Point3D(x, z, y)
     create_point_zyx = lambda x, y, z: Point3D(z, y, x)
     create_point_yxz = lambda x, y, z: Point3D(y, x, z)
 
     x, y, z = Point3D.x, Point3D.y, Point3D.z
 
-    skeleton.extend(_get_edges(sorted(points, key=get_zyx), step, x, y, z, create_point_xyz))
+    skeleton.extend(_get_edges(sorted(points, key=get_yzx), step, x, z, y, create_point_xzy))
     skeleton.extend(_get_edges(sorted(points, key=get_xyz), step, z, y, x, create_point_zyx))
     skeleton.extend(_get_edges(sorted(points, key=get_zxy), step, y, x, z, create_point_yxz))
 
