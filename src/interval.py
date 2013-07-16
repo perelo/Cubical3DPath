@@ -132,8 +132,14 @@ class Interval2D(object):
 
 class Interval3D(object):
 
-    def __init__(self, segments=[]):
+    def __init__(self, segments=[],
+                 int_xz=Interval2D(),
+                 int_zy=Interval2D(),
+                 int_yx=Interval2D()):
         self.segments = segments
+        self.int_xz = int_xz
+        self.int_zy = int_zy
+        self.int_yx = int_yx
 
     def get_projected_segments(self):
         xy = [Segment3D(Point3D(e.a.x(), e.a.y(), 0), Point3D(e.b.x(), e.b.y(), 0))

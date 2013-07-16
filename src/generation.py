@@ -107,11 +107,20 @@ def generate_interval3D(p_min, p_max, step):
 
     x, y, z = Point3D.x, Point3D.y, Point3D.z
 
-    skeleton.extend(_get_edges(sorted(points, key=get_yzx), step, x, z, y, create_point_xzy))
-    skeleton.extend(_get_edges(sorted(points, key=get_xyz), step, z, y, x, create_point_zyx))
-    skeleton.extend(_get_edges(sorted(points, key=get_zxy), step, y, x, z, create_point_yxz))
+    edges_xz = _get_edges(sorted(points, key=get_yzx), step, x, z, y, create_point_xzy)
+    edges_zy = _get_edges(sorted(points, key=get_xyz), step, z, y, x, create_point_zyx)
+    edges_yx = _get_edges(sorted(points, key=get_zxy), step, y, x, z, create_point_yxz)
 
-    return interval.Interval3D(skeleton)
+    skeleton.extend(edges_xz)
+    skeleton.extend(edges_zy)
+    skeleton.extend(edges_yx)
+
+    # new projections
+    interval_xz = _get_interval2D(edges_xz, x, z, create_point_xzy)
+    interval_zy = _get_interval2D(edges_zy, z, y, create_point_zyx)
+    interval_yx = _get_interval2D(edges_yx, y, x, create_point_yxz)
+
+    return interval.Interval3D(skeleton, interval_xz, interval_zy, interval_yx)
 
 
 def _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step):
@@ -145,6 +154,48 @@ def _clean_flat_faces(points, step):
                points.remove(p)
 
     return points
+
+
+def _get_interval2D(edges, x, y, create_point):
+    # extend adjacent edges and project them on xy
+    ext_2d_edges = []
+
+    # edges are horizontal (e.a.y = e.b.y and e.a.x < e.b.x)
+    y_ref = y(edges[0].a)
+    min_x = x(edges[0].a)
+    max_x = x(edges[0].b)
+    for e in edges:
+        if y(e.a) != y_ref:
+            ext_2d_edges.append(
+                Edge3D(create_point(min_x, y_ref, 0), create_point(max_x, y_ref, 0)))
+            min_x, max_x = x(e.a), x(e.b)
+            y_ref = y(e.a)
+        elif x(e.b) > max_x:
+            max_x = x(e.b)
+
+    ext_2d_edges.append(
+        Edge3D(create_point(min_x, y_ref, 0), create_point(max_x, y_ref, 0)))
+
+    # now, retrieve interval2D points (don't care about squares atm)
+    int_points = []
+
+    # get lower line's points
+    int_points.append(ext_2d_edges[0].a)
+    int_points.append(ext_2d_edges[0].b)
+    for e in ext_2d_edges[1:]:
+        if x(e.b) > x(int_points[-1]):
+            int_points.append(create_point(x(int_points[-1]), y(e.b), 0))
+            int_points.append(e.b)
+
+    # get upper line's points
+    int_points.append(ext_2d_edges[-1].b)
+    int_points.append(ext_2d_edges[-1].a)
+    for e in ext_2d_edges[::-1]:
+        if x(e.a) < x(int_points[-1]):
+            int_points.append(create_point(x(int_points[-1]), y(e.a), 0))
+            int_points.append(e.a)
+
+    return interval.Interval2D(int_points)
 
 
 def _get_edges(points, step, x, y, z, create_point):
