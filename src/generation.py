@@ -90,11 +90,28 @@ def generate_interval3D(p_min, p_max, step):
     xz = generate_interval2D(p_min, p_max, step)
     yz = generate_interval2D(p_min, p_max, step)
 
-    # reconstruct the volume
+    # get the 3D points
     points = _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step)
     points = _clean_flat_faces(points, step)
-    segments = _extract_skeleton(points, step)
-    return interval.Interval3D(segments)
+
+    # extract the skeleton from the points
+    skeleton = []
+
+    get_zyx = lambda p: (p.z(), p.y(), p.x())
+    get_xyz = lambda p: (p.x(), p.y(), p.z())
+    get_zxy = lambda p: (p.z(), p.x(), p.y())
+
+    create_point_xyz = lambda x, y, z: Point3D(x, y, z)
+    create_point_zyx = lambda x, y, z: Point3D(z, y, x)
+    create_point_yxz = lambda x, y, z: Point3D(y, x, z)
+
+    x, y, z = Point3D.x, Point3D.y, Point3D.z
+
+    skeleton.extend(_get_edges(sorted(points, key=get_zyx), step, x, y, z, create_point_xyz))
+    skeleton.extend(_get_edges(sorted(points, key=get_xyz), step, z, y, x, create_point_zyx))
+    skeleton.extend(_get_edges(sorted(points, key=get_zxy), step, y, x, z, create_point_yxz))
+
+    return interval.Interval3D(skeleton)
 
 
 def _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step):
@@ -128,28 +145,6 @@ def _clean_flat_faces(points, step):
                points.remove(p)
 
     return points
-
-
-def _extract_skeleton(points, step):
-    skeleton = []
-
-    get_zyx = lambda p: (p.z(), p.y(), p.x())
-    get_xyz = lambda p: (p.x(), p.y(), p.z())
-    get_zxy = lambda p: (p.z(), p.x(), p.y())
-
-    create_point_xyz = lambda x, y, z: Point3D(x, y, z)
-    skeleton.extend(_get_edges(sorted(points, key=get_zyx), step,
-                                       Point3D.x, Point3D.y, Point3D.z, create_point_xyz))
-
-    create_point_zyx = lambda x, y, z: Point3D(z, y, x)
-    skeleton.extend(_get_edges(sorted(points, key=get_xyz), step,
-                                       Point3D.z, Point3D.y, Point3D.x, create_point_zyx))
-
-    create_point_yxz = lambda x, y, z: Point3D(y, x, z)
-    skeleton.extend(_get_edges(sorted(points, key=get_zxy), step,
-                                       Point3D.y, Point3D.x, Point3D.z, create_point_yxz))
-
-    return skeleton
 
 
 def _get_edges(points, step, x, y, z, create_point):
