@@ -120,6 +120,12 @@ def generate_interval3D(p_min, p_max, step):
     interval_zy = _get_interval2D(edges_zy, z, y, create_point_zyx)
     interval_yx = _get_interval2D(edges_yx, y, x, create_point_yxz)
 
+    if interval_xz is None or \
+       interval_zy is None or \
+       interval_yx is None:
+        print "Structure not connected, try again."
+        return interval.Interval3D()
+
     return interval.Interval3D(skeleton, interval_xz, interval_zy, interval_yx)
 
 
@@ -184,6 +190,8 @@ def _get_interval2D(edges, x, y, create_point):
     int_points.append(ext_2d_edges[0].b)
     for e in ext_2d_edges[1:]:
         if x(e.b) > x(int_points[-1]):
+            if x(e.a) > x(int_points[-1]): # structure not connected
+                return None
             int_points.append(create_point(x(int_points[-1]), y(e.b), 0))
             int_points.append(e.b)
 
@@ -192,6 +200,8 @@ def _get_interval2D(edges, x, y, create_point):
     int_points.append(ext_2d_edges[-1].a)
     for e in ext_2d_edges[::-1]:
         if x(e.a) < x(int_points[-1]):
+            # no need to test if edges are connected here
+            # because we would have detect it above
             int_points.append(create_point(x(int_points[-1]), y(e.a), 0))
             int_points.append(e.a)
 
