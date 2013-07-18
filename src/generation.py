@@ -61,11 +61,19 @@ def generate_interval2D(p_min, p_max, step):
             inc = step if not lower_line_done else 0
             high = randrange(max(low+inc, old_high), yMax+step, step)
             if old_high < high:
-                # add points to make the upper_line rectilinear
-                upper_line.append(Point2D(i, old_high))
-                upper_line.append(Point2D(i, high))
-                square_up = Point2D(i, old_high)
-                old_high = high
+                if square_up and old_high == old_low:
+                    # lower_line has expanded, upper_line want to,
+                    # raise the new upper_line threshold
+                    # so that upper and lower lines don't "kiss"
+                    old_high += step
+                    high += step
+                    upper_line[-1].get()[1] += step
+                if old_high < yMax: # don't add points above yMax
+                    # add points to make the upper_line rectilinear
+                    upper_line.append(Point2D(i, old_high))
+                    square_up = Point2D(i, old_high)
+                    old_high = high if high <= yMax else yMax
+                    upper_line.append(Point2D(i, old_high))
             if high >= yMax:
                 upper_line_done = True
 
