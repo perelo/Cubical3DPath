@@ -144,15 +144,17 @@ def generate_interval2D_broken(p_min, p_max, step, allow_kissing):
     return interval.Interval2D(lower_line, squares)
 
 
-def generate_interval3D(p_min, p_max, step):
+def generate_interval3D(p_min, p_max, step, allow_degenerate):
     # generate three random 2D intervals
-    xy = generate_interval2D(p_min, p_max, step, False)
-    xz = generate_interval2D(p_min, p_max, step, False)
-    yz = generate_interval2D(p_min, p_max, step, False)
+    xy = generate_interval2D(p_min, p_max, step, allow_degenerate)
+    xz = generate_interval2D(p_min, p_max, step, allow_degenerate)
+    yz = generate_interval2D(p_min, p_max, step, allow_degenerate)
 
     # get the 3D points
     points = _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step)
-    points = _clean_flat_faces(points, step)
+
+    if not allow_degenerate:
+        points = _clean_flat_faces(points, step)
 
     # extract the skeleton from the points
     skeleton = []

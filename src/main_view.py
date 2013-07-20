@@ -35,6 +35,9 @@ class MainWindow(QtGui.QMainWindow):
         btn_generate.setToolTip('Generate random 2D intervals on the 3 planes')
         self.connect(btn_generate, QtCore.SIGNAL('clicked()'), self.btn_generate_action)
 
+        chk_degenerate = QtGui.QCheckBox("Allow degenerate")
+        chk_degenerate.stateChanged.connect(self.chk_degenerate_action)
+
         btn_save = QtGui.QPushButton("Save")
         self.connect(btn_save, QtCore.SIGNAL('clicked()'), self.btn_save_action)
 
@@ -52,6 +55,7 @@ class MainWindow(QtGui.QMainWindow):
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(btn_reset)
         vbox.addWidget(btn_generate)
+        vbox.addWidget(chk_degenerate)
         vbox.addWidget(btn_save)
         vbox.addWidget(btn_load)
         vbox.addWidget(chk_draw_axis)
@@ -79,6 +83,9 @@ class MainWindow(QtGui.QMainWindow):
         self.canevas.model.init_data()
         self.chk_draw_projs_action(self.chk_draw_projs.checkState())
         self.canevas.update()
+
+    def chk_degenerate_action(self, state):
+        self.canevas.model.degenerate = (state == QtCore.Qt.Checked)
 
     def btn_save_action(self):
         file_name = QtGui.QFileDialog.getSaveFileName(self, 'Save intervals as binary file', 'data.i3db', 'Interval3D (*.i3db*)')

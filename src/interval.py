@@ -19,6 +19,7 @@ class Intervals(object):
 
     def __init__(self):
         self.data = []      # list of tuples (list of data, type, r, g, b)
+        self.degenerate = False
         self.init_data()
 
 
@@ -28,7 +29,7 @@ class Intervals(object):
         p_max = Point3D(15, 15, 15)
         step = 2
 
-        self.interval3D = gen.generate_interval3D(p_min, p_max, step) \
+        self.interval3D = gen.generate_interval3D(p_min, p_max, step, self.degenerate) \
                                 if not interval3D else interval3D
 
         #self.data = [(util.flat_segments(self.interval3D.segments), GL_LINES, 1, 1, 1)]
