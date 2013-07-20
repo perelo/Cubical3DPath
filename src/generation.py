@@ -39,7 +39,9 @@ def generate_interval2D(p_min, p_max, step, allow_kissing):
         top_right = Point2D(randrange(bottom_left.x()+step,
                                       xMax+step,
                                       step),
-                            randrange(old_top_right.y()+(step if bottom_left.y() == old_bottom_left.y() else 0),
+                            randrange(old_top_right.y()+ \
+                                                (step if bottom_left.y() == old_bottom_left.y() or
+                                                         bottom_left.y() == old_top_right.y() else 0),
                                       yMax+step,
                                       step))
         rects.append((bottom_left, top_right))
