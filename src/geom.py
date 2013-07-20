@@ -72,14 +72,14 @@ class Point3D(object):
     def __ne__(self,other):
         return not (self==other)
 
-class Segment3D(object):
+class Segment(object):
     def __init__(self,a=Point3D(),b=Point3D()):
         self.a = a
         self.b = b
     def __hash__(self):
         return hash(self.a) + hash(self.b)
     def __repr__(self):
-        return "Segment3D("+str(self.a)+","+str(self.b)+")"
+        return "Segment("+str(self.a)+","+str(self.b)+")"
     def __str__(self):
         return "S("+str(self.a)+","+str(self.b)+")"
     def __eq__(self,other):
@@ -89,7 +89,7 @@ class Segment3D(object):
     def flat(self):
         return [tuple(self.a.coordinates), tuple(self.b.coordinates)]
 
-class Edge3D(Segment3D):
+class Edge3D(Segment):
     # edge types
     UNKNOWN = 0
     CONVEX  = 1
