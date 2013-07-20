@@ -15,7 +15,59 @@ from geom import *
 import interval
 
 
-def generate_interval2D(p_min, p_max, step):
+def generate_interval2D(p_min, p_max, step, allow_kissing):
+    xMin = p_min.x()
+    yMin = p_min.y()
+    xMax = p_max.x()
+    yMax = p_max.y()
+
+    if xMin >= xMax or yMin >= yMax:
+        return []
+
+    rects = [] # tuples of points (bottom_left, top_right)
+
+    # for initialization for first bottom_left that MUST be p_min
+    old_bottom_left = Point2D(yMin, yMin)
+    old_top_right = Point2D(xMin, yMin+(step if not allow_kissing else 0))
+
+    # generate the rectangles
+    while old_top_right.x() < xMax and old_top_right.y() < yMax:
+        bottom_left = Point2D(old_top_right.x(),
+                              randrange(old_bottom_left.y(),
+                                        old_top_right.y()+(step if allow_kissing else 0),
+                                        step))
+        top_right = Point2D(randrange(bottom_left.x()+step,
+                                      xMax+step,
+                                      step),
+                            randrange(old_top_right.y()+(step if bottom_left.y() == old_bottom_left.y() else 0),
+                                      yMax+step,
+                                      step))
+        rects.append((bottom_left, top_right))
+        old_bottom_left = bottom_left
+        old_top_right   = top_right
+
+    # force the last top right to be p_max
+    rects[-1] = (rects[-1][0], p_max)
+
+    # get lower and upper line from the rectangles
+    lower_line = [rects[0][0]]
+    upper_line = [Point2D(rects[0][0].x(), rects[0][1].y())]
+    for s in rects:
+        if s[0].y() != lower_line[-1].y():
+            lower_line.append(Point2D(s[0].x(), lower_line[-1].y()))
+            lower_line.append(s[0])
+        if s[1].y() != upper_line[-1].y():
+            upper_line.append(Point2D(s[0].x(), upper_line[-1].y()))
+            upper_line.append(Point2D(s[0].x(), s[1].y()))
+    lower_line.append(Point2D(rects[-1][1].x(), rects[-1][0].y()))
+    upper_line.append(rects[-1][1])
+
+    upper_line.reverse()
+    lower_line.extend(upper_line)
+    return interval.Interval2D(lower_line, rects)
+
+
+def generate_interval2D_broken(p_min, p_max, step, allow_kissing):
     xMin = p_min.x()
     yMin = p_min.y()
     xMax = p_max.x()
@@ -94,9 +146,9 @@ def generate_interval2D(p_min, p_max, step):
 
 def generate_interval3D(p_min, p_max, step):
     # generate three random 2D intervals
-    xy = generate_interval2D(p_min, p_max, step)
-    xz = generate_interval2D(p_min, p_max, step)
-    yz = generate_interval2D(p_min, p_max, step)
+    xy = generate_interval2D(p_min, p_max, step, False)
+    xz = generate_interval2D(p_min, p_max, step, False)
+    yz = generate_interval2D(p_min, p_max, step, False)
 
     # get the 3D points
     points = _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step)
@@ -271,6 +323,12 @@ def _compute_edge_type(points, e, step, x, y, z, create_point, first=True):
             b = (p_up   and q_up   and not p_up_back    and not q_up_back) or \
                 (p_down and q_down and not p_down_front and not q_down_front)
             return Edge3D.CONCAVE if b else Edge3D.UNKNOWN
+
+    # lonely edge that connect two cubical complexes
+    #b = (p_up and p_front and not p_down and not p_back and \
+         #q_back and q_down and not q_up and q_down) or \
+        #(q_up and q_front and not q_down and not q_back and \
+         #p_back and p_down and not p_up and p_down)
 
     # convex
     return Edge3D.CONVEX
