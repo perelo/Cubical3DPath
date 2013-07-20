@@ -13,3 +13,6 @@ def flat_points(points):
 
 def flat_segments(segments):
     return [coord for s in segments for coord in (s.a.get(), s.b.get())]
+
+def signum(x):
+    return cmp(x, 0)

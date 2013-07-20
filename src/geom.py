@@ -10,6 +10,8 @@ __date__ = '17-06-2013'
 
 import math
 
+from util import signum
+
 class Point2D(object):
     def __init__(self,x=0,y=0):
         self.coordinates = [x,y]
@@ -238,3 +240,11 @@ class Matrix4x4(object):
                 a.m[ 2]*b.x() + a.m[ 6]*b.y() + a.m[10]*b.z() + a.m[14]
                 )
 
+def orientation(p, q, r):
+    """
+        Compute the orientation of three given points
+        return < 0 if it's a left turn,
+               > 0 if it's a right turn,
+               = 0 if points are aligned
+    """
+    return signum((p.x() - r.x()) * (q.y() - r.y()) - (p.y() - r.y()) * (q.x() - r.x()));
