@@ -88,8 +88,6 @@ class Segment(object):
         return (self.a==other.a and self.b==other.b) or (self.b==other.a and self.a==other.b)
     def __ne__(self,other):
         return not (self==other)
-    def flat(self):
-        return [tuple(self.a.coordinates), tuple(self.b.coordinates)]
     def intersect(self,other):
         return orientation(self.a , self.b , other.a) != orientation(self.a , self.b , other.b) \
                             if self.a != self.b else True and \
