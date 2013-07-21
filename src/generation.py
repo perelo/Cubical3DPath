@@ -254,27 +254,66 @@ def _get_interval2D(edges, x, y, create_point):
     # now, retrieve interval2D points (don't care about squares atm)
     int_points = []
 
+    lower_line = []
     # get lower line's points
-    int_points.append(ext_2d_edges[0].a)
-    int_points.append(ext_2d_edges[0].b)
+    lower_line.append(ext_2d_edges[0].a)
+    lower_line.append(ext_2d_edges[0].b)
     for e in ext_2d_edges[1:]:
-        if x(e.b) > x(int_points[-1]):
-            if x(e.a) > x(int_points[-1]): # structure not connected
+        if x(e.b) > x(lower_line[-1]):
+            if x(e.a) > x(lower_line[-1]): # structure not connected
                 return None
-            int_points.append(create_point(x(int_points[-1]), y(e.b), 0))
-            int_points.append(e.b)
+            lower_line.append(create_point(x(lower_line[-1]), y(e.b), 0))
+            lower_line.append(e.b)
 
+    upper_line = []
     # get upper line's points
-    int_points.append(ext_2d_edges[-1].b)
-    int_points.append(ext_2d_edges[-1].a)
+    upper_line.append(ext_2d_edges[-1].b)
+    upper_line.append(ext_2d_edges[-1].a)
     for e in ext_2d_edges[::-1]:
-        if x(e.a) < x(int_points[-1]):
+        if x(e.a) < x(upper_line[-1]):
             # no need to test if edges are connected here
             # because we would have detect it above
-            int_points.append(create_point(x(int_points[-1]), y(e.a), 0))
-            int_points.append(e.a)
+            upper_line.append(create_point(x(upper_line[-1]), y(e.a), 0))
+            upper_line.append(e.a)
 
-    return interval.Interval2D(int_points)
+    int_points = lower_line[:]
+    int_points.extend(upper_line)
+
+    # ok, now let's extract the squares from lower and upper line
+    squares = []
+    candidates = [] # tuples of vertical bottom_left, top_right (asynchronous)
+
+    # to treat candidates when the upper_line has some thresholds
+    # after the last threshold of lower_line, we upper_line[0] (Point(xmax, ymax))
+    lower_line.append(upper_line[0])
+    upper_line.reverse() # make it go up
+
+    i = 0 # index in lower_line
+    j = 1 # index in upper_line
+    # we iterate through lower and upper_line simultaneously,
+    # and mark all bottom_left and top_right points, but verticaly
+    while i < len(lower_line) and j < len(upper_line):
+        low = lower_line[i]
+        up  = upper_line[j]
+        if x(low) < x(up):
+            candidates.append((low, create_point(x(low), y(up), 0)))
+            old_low_y = y(low)
+            i += 2
+        elif x(low) > x(up):
+            candidates.append((create_point(x(up), old_low_y, 0), up))
+            j += 2
+        else: # x(low) == x(up)
+            candidates.append((low, up))
+            old_low_y = y(low)
+            i += 2
+            j += 2
+
+    # squares are formed by the bottom left of a candidate
+    # and the top left of the next candidate
+    for i in xrange(len(candidates)-1):
+        squares.append((candidates[i][0], candidates[i+1][1]))
+
+    return interval.Interval2D(int_points, squares)
 
 
 def _get_edges(points, step, x, y, z, create_point):
