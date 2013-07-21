@@ -91,15 +91,10 @@ class Segment(object):
     def flat(self):
         return [tuple(self.a.coordinates), tuple(self.b.coordinates)]
     def intersect(self,other):
-        if self.a == self.b:
-            return orientation(other.a, other.b, self.a) == 0
-        elif other.a == other.b:
-            return orientation(self.a, self.b, other.a) == 0
-        else:
-            return orientation(self.a , self.b , other.a) != orientation(self.a , self.b , other.b) \
-                                if self.a != self.b else True and \
-                   orientation(other.a, other.b, self.a)  != orientation(other.a, other.b, self.b) \
-                                if other.a != other.b else True
+        return orientation(self.a , self.b , other.a) != orientation(self.a , self.b , other.b) \
+                            if self.a != self.b else True and \
+               orientation(other.a, other.b, self.a)  != orientation(other.a, other.b, self.b) \
+                            if other.a != other.b else True
 
 class Edge3D(Segment):
     # edge types
