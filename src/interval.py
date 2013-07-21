@@ -44,7 +44,7 @@ class Intervals(object):
         self.data.append((util.flat_segments(concave_edges), GL_LINES, 1, 1, 0))
 
         # interval2Ds (projections of Interval3D)
-        self.int2Ds = [self.interval3D.int_xz, self.interval3D.int_zy, self.interval3D.int_yx]
+        self.int2Ds = [self.interval3D.int_xy, self.interval3D.int_zx, self.interval3D.int_yz]
         for i in xrange(len(self.int2Ds)):
             self.int2Ds[i] = (util.flat_points(self.int2Ds[i].points), GL_LINE_LOOP, 1, 0, 0)
 
@@ -139,11 +139,11 @@ class Interval2D(object):
 class Interval3D(object):
 
     def __init__(self, segments=[],
-                 int_xz=Interval2D(),
-                 int_zy=Interval2D(),
-                 int_yx=Interval2D()):
+                 int_xy=Interval2D(),
+                 int_zx=Interval2D(),
+                 int_yz=Interval2D()):
         self.segments = segments
-        self.int_xz = int_xz
-        self.int_zy = int_zy
-        self.int_yx = int_yx
+        self.int_xy = int_xy
+        self.int_zx = int_zx
+        self.int_yz = int_yz
 

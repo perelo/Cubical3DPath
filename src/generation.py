@@ -165,9 +165,14 @@ def generate_interval3D(p_min, p_max, step, allow_degenerate):
     get_xyz = lambda p: (p.x(), p.y(), p.z())
     get_zxy = lambda p: (p.z(), p.x(), p.y())
 
+    # create_points for 3D edges
     create_point_xzy = lambda x, y, z: Point3D(x, z, y)
     create_point_zyx = lambda x, y, z: Point3D(z, y, x)
     create_point_yxz = lambda x, y, z: Point3D(y, x, z)
+    # create_points for new interval2Ds
+    create_point_xyz = lambda x, y, z: Point3D(x, y, z)
+    create_point_yzx = lambda x, y, z: Point3D(y, z, x)
+    create_point_zxy = lambda x, y, z: Point3D(z, x, y)
 
     x, y, z = Point3D.x, Point3D.y, Point3D.z
 
@@ -180,17 +185,17 @@ def generate_interval3D(p_min, p_max, step, allow_degenerate):
     skeleton.extend(edges_yx)
 
     # new projections
-    interval_xz = _get_interval2D(edges_xz, x, z, create_point_xzy)
-    interval_zy = _get_interval2D(edges_zy, z, y, create_point_zyx)
-    interval_yx = _get_interval2D(edges_yx, y, x, create_point_yxz)
+    interval_xy = _get_interval2D(edges_xz, x, y, create_point_xyz)
+    interval_zx = _get_interval2D(edges_zy, z, x, create_point_yzx)
+    interval_yz = _get_interval2D(edges_yx, y, z, create_point_zxy)
 
-    if interval_xz is None or \
-       interval_zy is None or \
-       interval_yx is None:
+    if interval_xy is None or \
+       interval_zx is None or \
+       interval_yz is None:
         print "Structure not connected, try again."
         return interval.Interval3D()
 
-    return interval.Interval3D(skeleton, interval_xz, interval_zy, interval_yx)
+    return interval.Interval3D(skeleton, interval_xy, interval_zx, interval_yz)
 
 
 def _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step):
