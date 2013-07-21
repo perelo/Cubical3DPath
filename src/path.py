@@ -12,9 +12,15 @@ from interval import *
 
 
 def visible(interval, p, q):
-    if not isinstance(interval, Interval2D):
+    if  isinstance(interval, Interval2D):
+        return _visible_2D(interval, p, q)
+    elif isinstance(interval, Interval3D):
+        return _visible_3D(interval, p, q)
+    else:
         return False
 
+
+def _visible_2D(interval, p, q):
     i = interval.find_square(p)
     j = interval.find_square(q)
 
@@ -34,4 +40,11 @@ def visible(interval, p, q):
             return False
 
     return True
+
+
+def _visible_3D(interval, p, q):
+    vis_xy = _visible_2D(interval.int_xy, p, q)
+    vis_zx = _visible_2D(interval.int_zx.copy_2D(Point3D.z, Point3D.x), p, q)
+    vis_yz = _visible_2D(interval.int_yz.copy_2D(Point3D.y, Point3D.z), p, q)
+    return vis_xy and vis_zx and vis_yz
 
