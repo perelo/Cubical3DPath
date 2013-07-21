@@ -73,6 +73,8 @@ class Point3D(object):
         return self.x()==other.x() and self.y()==other.y() and self.z()==other.z()
     def __ne__(self,other):
         return not (self==other)
+    def copy_2D(self,x,y):
+        return Point2D(x(self),y(self))
 
 class Segment(object):
     def __init__(self,a=Point3D(),b=Point3D()):

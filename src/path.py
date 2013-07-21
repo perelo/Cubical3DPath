@@ -41,8 +41,10 @@ def _visible_2D(interval, p, q):
 
 
 def _visible_3D(interval, p, q):
+    zx = (Point3D.z, Point3D.x)
+    yz = (Point3D.y, Point3D.z)
     vis_xy = _visible_2D(interval.int_xy, p, q)
-    vis_zx = _visible_2D(interval.int_zx.copy_2D(Point3D.z, Point3D.x), p, q)
-    vis_yz = _visible_2D(interval.int_yz.copy_2D(Point3D.y, Point3D.z), p, q)
+    vis_zx = _visible_2D(interval.int_zx.copy_2D(*zx), p.copy_2D(*zx), q.copy_2D(*zx))
+    vis_yz = _visible_2D(interval.int_yz.copy_2D(*yz), p.copy_2D(*yz), q.copy_2D(*yz))
     return vis_xy and vis_zx and vis_yz
 
