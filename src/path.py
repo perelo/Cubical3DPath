@@ -12,12 +12,10 @@ from interval import *
 
 
 def visible(interval, p, q):
-    if  isinstance(interval, Interval2D):
-        return _visible_2D(interval, p, q)
-    elif isinstance(interval, Interval3D):
-        return _visible_3D(interval, p, q)
-    else:
-        return False
+    f = lambda i, p, q: False
+    d = dict(((Interval2D, _visible_2D),
+              (Interval3D, _visible_3D)))
+    return d.get(type(interval), f)(interval, p, q)
 
 
 def _visible_2D(interval, p, q):
