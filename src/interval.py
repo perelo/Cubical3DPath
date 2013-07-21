@@ -86,6 +86,10 @@ class Interval2D(object):
             return self._contains_binary_search(point) if self.squares else \
                    self._contains_ray_throwing (point)
 
+    def copy_2D(self, x, y):
+        points = [Point2D(x(p), y(p)) for p in self.points]
+        squares = [(Point2D(x(s[0]), y(s[0])), Point2D(x(s[1]), y(s[1]))) for s in self.squares]
+        return Interval2D(points, squares)
 
     def _contains_binary_search(self, point, imin=None, imax=None):
         return -1 != self.find_square(point, imin, imax)
