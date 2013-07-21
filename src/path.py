@@ -36,7 +36,7 @@ def _visible_2D(interval, p, q):
     for n in xrange(i, j):
         s1 = interval.squares[n  ]
         s2 = interval.squares[n+1]
-        if not s.intersect(Segment(s1[1], s2[0])):
+        if not s.does_intersect(Segment(s1[1], s2[0])):
             return False
 
     return True
