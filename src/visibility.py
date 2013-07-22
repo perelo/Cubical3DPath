@@ -17,14 +17,24 @@ UPPER_CHAIN = 1 << 1
 ALL_CHAINS  = UPPER_CHAIN | LOWER_CHAIN
 
 
-def visible(interval, p, q):
+def visibility(interval, p, q):
     f = lambda i, p, q: False
-    d = dict(((Interval2D, _visible_2D),
-              (Interval3D, _visible_3D)))
+    d = dict(((Interval2D, _visibility_2D),
+              (Interval3D, _visibility_3D)))
     return d.get(type(interval), f)(interval, p, q)
 
 
-def _visible_2D(interval, p, q):
+def _visibility_2D(interval, p, q):
+    if isinstance(p, (Point2D, Point3D)):
+        if isinstance(q, (Point2D, Point3D)):
+            return _visibility_2D_point_point(interval, p, q)
+        else:
+            return _visibility_2D_point_segment(interval, p, q)
+    else:
+        return _visibility_2D_segment_segment(interval, p, q)
+
+
+def _visibility_2D_point_point(interval, p, q):
     mask = NO_CHAIN
     if interval.find_square(p) == interval.find_square(q):
         return mask
@@ -46,7 +56,15 @@ def _visible_2D(interval, p, q):
     return mask
 
 
-def _visible_3D(interval, p, q):
+def _visibility_2D_point_segment(interval, p, s):
+    pass
+
+
+def _visibility_2D_segment_segment(interval, s1, s2):
+    pass
+
+
+def _visibility_3D(interval, p, q):
     zx = (Point3D.z, Point3D.x)
     yz = (Point3D.y, Point3D.z)
     vis_xy = _visible_2D(interval.int_xy, p, q)
