@@ -11,6 +11,12 @@ __date__ = '20-07-2013'
 from interval import *
 
 
+NO_CHAIN    = 0
+LOWER_CHAIN = 1 << 0
+UPPER_CHAIN = 1 << 1
+ALL_CHAINS  = UPPER_CHAIN | LOWER_CHAIN
+
+
 def visible(interval, p, q):
     f = lambda i, p, q: False
     d = dict(((Interval2D, _visible_2D),
@@ -19,25 +25,25 @@ def visible(interval, p, q):
 
 
 def _visible_2D(interval, p, q):
-    i = interval.find_square(p)
-    j = interval.find_square(q)
+    mask = NO_CHAIN
+    if interval.find_square(p) == interval.find_square(q):
+        return mask
 
-    if i == -1 or j == -1:
-        return False
-    elif i == j:
-        return True
+    i = 1
+    segments = []
+    # add vertical segments of lower and upper_line to be tested w/ intersection
+    # when a.y() < b.y(), it's on lower_line, else it's on upper_line
+    while i < len(interval.points)-1:
+        segments.append(Segment(interval.points[i], interval.points[i+1]))
+        i += 2
 
-    if i > j:
-        i, j = j, i
+    line_pq = Segment(p,q).asLine()
+    for s in segments:
+        p = line_pq.intersection(s)
+        if p is not None:
+            mask |= LOWER_CHAIN if s.a.y() < s.b.y() else UPPER_CHAIN
 
-    s = Segment(p,q)
-    for n in xrange(i, j):
-        s1 = interval.squares[n  ]
-        s2 = interval.squares[n+1]
-        if not s.does_intersect(Segment(s1[1], s2[0])):
-            return False
-
-    return True
+    return mask
 
 
 def _visible_3D(interval, p, q):
