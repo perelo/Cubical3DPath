@@ -37,6 +37,13 @@ class Point2D(object):
         return self.x()==other.x() and self.y()==other.y()
     def __ne__(self,other):
         return not (self==other)
+    def is_in_rectangle(self, diagonal):
+        return ((diagonal.a.x() <  diagonal.b.x() and diagonal.a.x() <  self.x() <  diagonal.b.x()) or
+                (diagonal.a.x() >  diagonal.b.x() and diagonal.a.x() >  self.x() >  diagonal.b.x()) or
+                (diagonal.a.x() == diagonal.b.x() and diagonal.a.x() == self.x() == diagonal.b.x())) \
+           and ((diagonal.a.y() <  diagonal.b.y() and diagonal.a.y() <  self.y() <  diagonal.b.y()) or
+                (diagonal.a.y() >  diagonal.b.y() and diagonal.a.y() >  self.y() >  diagonal.b.y()) or
+                (diagonal.a.y() == diagonal.b.y() and diagonal.a.y() == self.y() == diagonal.b.y()))
 
 class Point3D(object):
     def __init__(self,x=0,y=0,z=0):
@@ -90,11 +97,41 @@ class Segment(object):
         return (self.a==other.a and self.b==other.b) or (self.b==other.a and self.a==other.b)
     def __ne__(self,other):
         return not (self==other)
-    def does_intersect(self,other):
-        return orientation(self.a , self.b , other.a) != orientation(self.a , self.b , other.b) \
-                            if self.a != self.b else True and \
-               orientation(other.a, other.b, self.a)  != orientation(other.a, other.b, self.b) \
-                            if other.a != other.b else True
+    def asLine(self):
+        A = self.a.y()-self.b.y()
+        B = self.b.x()-self.a.x()
+        C = -(A * self.a.x()) - (B * self.a.y())
+        return Line(A,B,C)
+    def intersection(self,other):
+        p = self.asLine().intersection(other)
+        return p if p is not None and p.is_in_rectangle(self) and p.is_in_rectangle(other) else None
+
+class Line(object):
+    def __init__(self,A=0,B=0,C=0):
+        self.A = A
+        self.B = B
+        self.C = C
+    def intersection(self, other):
+        line = other
+        other_is_segment = False
+        if isinstance(other, Segment):
+            line = line.asLine()
+            other_is_segment = True
+
+        det = self.A * line.B - line.A * self.B;
+        if det == 0:
+            return None
+        x = (self.B * line.C - line.B * self.C) / det;
+        y = (line.A * self.C - self.A * line.C) / det;
+        p = Point2D(x, y)
+        return None if other_is_segment and not p.is_in_rectangle(other) else p
+    def side(self,p):
+        """
+           Find the side of the line on which the point lies
+           return < 0 if it lies on one side, > 0 if on the other side,
+                  = 0 if it lies on this Line
+        """
+        return signum(A * p.x() + B * p.y() + C)
 
 class Edge3D(Segment):
     # edge types
