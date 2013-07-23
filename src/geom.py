@@ -14,7 +14,7 @@ from util import signum
 
 class Point2D(object):
     def __init__(self,x=0,y=0):
-        self.coordinates = [x,y]
+        self.coordinates = [float(x),float(y)]
     def x(self):
         return self.coordinates[0]
     def y(self):
@@ -47,7 +47,7 @@ class Point2D(object):
 
 class Point3D(object):
     def __init__(self,x=0,y=0,z=0):
-        self.coordinates = [x,y,z]
+        self.coordinates = [float(x),float(y),float(z)]
     def x(self):
         return self.coordinates[0]
     def y(self):
