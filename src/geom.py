@@ -111,6 +111,9 @@ class Segment(object):
     def intersection(self,other,open_seg=False):
         p = self.asLine().intersection(other)
         return p if p is not None and p.is_in_rectangle(self, open_seg) and p.is_in_rectangle(other, open_seg) else None
+    def middle(self):
+        coord = [sum(t)/2 for t in zip([float(c) for c in self.a.get()], self.b.get())]
+        return type(self.a)(*coord)
 
 class Line(object):
     def __init__(self,A=0,B=0,C=0):

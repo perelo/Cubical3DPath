@@ -59,7 +59,49 @@ def _visibility_2D_point_point(interval, p, q):
 
 
 def _visibility_2D_point_segment(interval, p, s):
-    pass
+    '''
+        find upper and lower visibility on s relative to p
+        return the visible sub segment or None
+        everything must be inside interval
+    '''
+
+    # determine the orientation of s
+    x, y = Point2D.x, Point2D.y
+    create_point = lambda x, y: Point2D(x, y)
+    if s.a.y() == s.b.y():
+        x, y = y, x
+        create_point = lambda x, y: Point2D(y, x)
+
+    # force s to be increasing
+    if y(s.a) > y(s.b):
+        s.a, s.b = s.b, s.a
+
+    p_min = p_max = None
+
+    # first, check if both end points of s are visible
+    line_s = s.asLine()
+    if _visibility_2D_point_point(interval, p, s.a) == 0:
+        p_min = s.a
+    if _visibility_2D_point_point(interval, p, s.b) == 0:
+        p_max = s.b
+
+    # if one of the end point isn't visible,
+    # iterate through the steps of the interval
+    # and compute the intersection and visibility
+    # to determine the visibility boundaries
+    if p_min is None or p_max is None:
+        steps_pts = interval.points[2::2]
+        steps_pts.remove(interval.squares[-1][1]) # remove top right point
+        for step in steps_pts:
+            seg = Segment(p, step)
+            inter = seg.asLine().intersection(s, True)
+            if inter and _visibility_2D_point_point(interval, p, inter) == 0:
+                if p_min is None or y(inter) < y(p_min):
+                    p_min = inter
+                if p_max is None or y(inter) > y(p_max):
+                    p_max = inter
+
+    return Segment(p_min, p_max) if p_min and p_max else None
 
 
 def _visibility_2D_segment_segment(interval, s1, s2):
