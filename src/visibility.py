@@ -44,13 +44,15 @@ def _visibility_2D_point_point(interval, p, q):
     # add vertical segments of lower and upper_line to be tested w/ intersection
     # when a.y() < b.y(), it's on lower_line, else it's on upper_line
     while i < len(interval.points)-1:
-        segments.append(Segment(interval.points[i], interval.points[i+1]))
+        if interval.points[i+1] != interval.squares[-1][1]: # don't add the rightmost segment
+            segments.append(Segment(interval.points[i], interval.points[i+1]))
         i += 2
 
-    line_pq = Segment(p,q).asLine()
+    seg_pq = Segment(p,q)
+    line_pq = seg_pq.asLine()
     for s in segments:
         p = line_pq.intersection(s)
-        if p is not None:
+        if p is not None and p.is_in_rectangle(seg_pq, True):
             mask |= LOWER_CHAIN if s.a.y() < s.b.y() else UPPER_CHAIN
 
     return mask
