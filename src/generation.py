@@ -200,9 +200,9 @@ def generate_interval3D(p_min, p_max, step, allow_degenerate):
 
 def _points3d_from_intervals2D(p_min, p_max, xy, xz, yz, step):
     points = []
-    for x in xrange(p_min.x(), p_max.x() + step, step):
-        for y in xrange(p_min.y(), p_max.y() + step, step):
-            for z in xrange(p_min.z(), p_max.z() + step, step):
+    for x in xrange(int(p_min.x()), int(p_max.x()) + step, step):
+        for y in xrange(int(p_min.y()), int(p_max.y()) + step, step):
+            for z in xrange(int(p_min.z()), int(p_max.z()) + step, step):
                 if Point2D(x, y) in xy and \
                    Point2D(x, z) in xz and \
                    Point2D(y, z) in yz:
