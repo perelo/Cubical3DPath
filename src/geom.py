@@ -160,7 +160,7 @@ class Edge3D(Segment):
 
 class Vector3D(object):
     def __init__(self,x=0,y=0,z=0):
-        self.coordinates = [x,y,z]
+        self.coordinates = [float(x),float(y),float(z)]
     def x(self):
         return self.coordinates[0]
     def y(self):
