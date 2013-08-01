@@ -110,19 +110,19 @@ class Segment(object):
         return (self.a==other.a and self.b==other.b) or (self.b==other.a and self.a==other.b)
     def __ne__(self,other):
         return not (self==other)
-    def asLine(self):
+    def asLine2D(self):
         A = self.a.y()-self.b.y()
         B = self.b.x()-self.a.x()
         C = -(A * self.a.x()) - (B * self.a.y())
-        return Line(A,B,C)
+        return Line2D(A,B,C)
     def intersection(self,other,open_seg=False):
-        p = self.asLine().intersection(other)
+        p = self.asLine2D().intersection(other)
         return p if p is not None and p.is_in_rectangle(self, open_seg) and p.is_in_rectangle(other, open_seg) else None
     def middle(self):
         coord = [sum(t)/2 for t in zip([float(c) for c in self.a.get()], self.b.get())]
         return type(self.a)(*coord)
 
-class Line(object):
+class Line2D(object):
     def __init__(self,A=0,B=0,C=0):
         self.A = A
         self.B = B
@@ -131,7 +131,7 @@ class Line(object):
         line = other
         other_is_segment = False
         if isinstance(other, Segment):
-            line = line.asLine()
+            line = line.asLine2D()
             other_is_segment = True
 
         det = self.A * line.B - line.A * self.B;

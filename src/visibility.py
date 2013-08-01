@@ -51,7 +51,7 @@ def _visibility_2D_point_point(interval, p, q):
         i += 2
 
     seg_pq = Segment(p,q)
-    line_pq = seg_pq.asLine()
+    line_pq = seg_pq.asLine2D()
     for s in segments:
         p = line_pq.intersection(s)
         if p is not None and p.is_in_rectangle(seg_pq, True):
@@ -96,7 +96,7 @@ def _visibility_2D_point_segment_old(interval, p, s):
         steps_pts.remove(interval.squares[-1][1]) # remove top right point
         for step in steps_pts:
             seg = Segment(p, step)
-            inter = seg.asLine().intersection(s, True)
+            inter = seg.asLine2D().intersection(s, True)
             if inter and _visibility_2D_point_point(interval, p, inter) == 0:
                 if p_min is None or y(inter) < y(p_min):
                     p_min = inter
