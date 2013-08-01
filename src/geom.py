@@ -160,6 +160,8 @@ class Line3D(object):
 
 class Plane(object):
     def __init__(self,p,v):
+        if not v:
+            raise Exception('Cannot instantiate Plane with nul vector')
         self.p = p # point passing through self or 'd' in the equation
         self.v = v # normal vector of self
     def _d(self):
