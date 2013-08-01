@@ -61,12 +61,12 @@ def _visibility_2D_point_point(interval, p, q):
 
 
 def _visibility_2D_point_segment_old(interval, p, s):
-    '''
+    """
         find upper and lower visibility on s relative to p
         return the visible sub segment or None
         everything must be inside interval
         /!\ Linear method /!\
-    '''
+    """
 
     # determine the orientation of s
     x, y = Point2D.x, Point2D.y
@@ -107,12 +107,12 @@ def _visibility_2D_point_segment_old(interval, p, s):
 
 
 def _visibility_2D_point_segment(interval, p, s):
-    '''
+    """
         find upper and lower visibility on s relative to p
         return the visible sub segment or None
         everything must be inside interval
         /!\ Binary search method /!\
-    '''
+    """
     p_min = p_max = None
 
     # determine the orientation of s
