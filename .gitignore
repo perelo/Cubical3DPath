@@ -33,3 +33,9 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# latex doc
+doc/*/*
+!doc/*/*.tex
+!doc/*/*.pdf
+!doc/*/*.png
