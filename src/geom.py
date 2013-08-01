@@ -115,6 +115,8 @@ class Segment(object):
         B = self.b.x()-self.a.x()
         C = -(A * self.a.x()) - (B * self.a.y())
         return Line2D(A,B,C)
+    def asLine3D(self):
+        return Line3D(self.a, Vector3D.vector_from_two_points(self.a, self.b))
     def intersection(self,other,open_seg=False):
         p = self.asLine2D().intersection(other)
         return p if p is not None and p.is_in_rectangle(self, open_seg) and p.is_in_rectangle(other, open_seg) else None
@@ -148,6 +150,52 @@ class Line2D(object):
                   = 0 if it lies on this Line
         """
         return signum(A * p.x() + B * p.y() + C)
+
+class Line3D(object):
+    def __init__(self,p,v):
+        self.p = p # point passing through self
+        self.v = v # vector director of self
+    def __str__(self):
+        return 'Line3D(' + str(self.p) + ', ' + str(self.v) + ')'
+
+class Plane(object):
+    def __init__(self,p,v):
+        self.p = p # point passing through self or 'd' in the equation
+        self.v = v # normal vector of self
+    def _d(self):
+        if isinstance(self.p, Point3D):
+            return - (self.p.x()*self.v.x()) - (self.p.y()*self.v.y()) - (self.p.z()*self.v.z())
+        else:
+            return self.p
+    def intersection(self,other):
+        if isinstance(other, Line3D):
+            if self.v * other.v == 0:
+                # other (line) and the normal vector of self are orthogonal
+                # now check if other.p lies on self
+                return other if other.p in self else None
+            else:
+                # we have a unique intersection point
+                # first compute the parameter of the line
+                t = - (self.v.x()*other.p.x() + self.v.y()*other.p.y() + self.v.z()*other.p.z() + self._d()) \
+                    / (self.v.x()*other.v.x() + self.v.y()*other.v.y() + self.v.z()*other.v.z())
+                # than deduce the coordinates of the intersection point
+                return Point3D(
+                    other.p.x() + other.v.x()*t,
+                    other.p.y() + other.v.y()*t,
+                    other.p.z() + other.v.z()*t )
+    def __contains__(self, other):
+        if isinstance(other, Point3D):
+            return 0 == self.v.x()*other.x() + self.v.y()*other.y() + self.v.z()*other.z() + self._d()
+    def __str__(self):
+        return 'Plane(' + str(self.p) + ', ' + str(self.v) + ')'
+
+    @staticmethod
+    def plane_from_3_points(p,q,r):
+        v1 = Vector3D.vector_from_two_points(p, q)
+        v2 = Vector3D.vector_from_two_points(p, r)
+        n = v1 ^ v2 # normal vector
+        return Plane(p, n.normalized())
+
 
 class Edge3D(Segment):
     # edge types
@@ -213,6 +261,11 @@ class Vector3D(object):
         return self.x()==other.x() and self.y()==other.y() and self.z()==other.z()
     def __ne__(self,other):
         return not (self==other)
+    def __nonzero__(self):
+        return self.coordinates != [0,0,0]
+    @staticmethod
+    def vector_from_two_points(p,q):
+        return Vector3D(q.x()-p.x(), q.y()-p.y(), q.z()-p.z())
 
 class Matrix4x4(object):
     def __init__(self):
