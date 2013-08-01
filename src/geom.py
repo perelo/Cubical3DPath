@@ -29,6 +29,9 @@ class Point2D(object):
         return Point2D( self.x(), self.y() )
     def average(self,other):
         return Point2D( (self.x()+other.x())*0.5, (self.y()+other.y())*0.5 )
+    def dominate(self,other):
+        return self.x() <= other.x() and \
+               self.y() <= other.y()
     def __add__(self,other):
         return Point2D( self.x()+other.x(), self.y()+other.y() )
     def __hash__(self):
@@ -74,6 +77,10 @@ class Point3D(object):
         return (other-self).length()
     def average(self,other):
         return Point3D( (self.x()+other.x())*0.5, (self.y()+other.y())*0.5, (self.z()+other.z())*0.5 )
+    def dominate(self,other):
+        return self.x() <= other.x() and \
+               self.y() <= other.y() and \
+               self.z() <= other.z()
     def __add__(self,other):
         return Point3D( self.x()+other.x(), self.y()+other.y(), self.z()+other.z() )
     def __sub__(self,other):
