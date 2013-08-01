@@ -1,0 +1,99 @@
+\documentclass[11pt]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% PAGE DIMENSIONS
+\usepackage{fullpage}
+%\usepackage{geometry} % to change the page dimensions
+%\geometry{a4paper} % or letterpaper (US) or a5paper or....
+% \geometry{margin=2in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+%%% END Article customizations
+
+%%% The "real" document content comes below...
+
+\title{Brief Article}
+\author{\'Eloi Perdereau}
+
+\begin{document}
+\maketitle
+
+\section{Notations}
+
+\paragraph{Chemin}
+Soit $p$ et $q$ deux points appartenant au complexe. On note $\lambda (p, q)$ la liste ordonnée des arêtes constituant le plus court chemin reliant $p$ à $q$.
+
+\section{Définitions}
+
+On considerera le point $o$ qui est le point du complexe dominant tout les autres.
+
+\paragraph{Domination}
+Soit $a$ et $b$ deux points de coordonnées respectives $(x_a, y_a, z_a)$ et $(x_b, y_b, z_b)$. On dit que $a$ domine $b$ si $x_a \leq x_b$, $y_a \leq y_b$ et $z_a \leq z_b$.
+
+\paragraph{Prolongement interne}
+Soit $p$ et $q$ deux points appartenant au complexe. On dit que $q$ est dans le prolongement interne de $\lambda (o, p)$ si $\lambda (o, p) \subset \lambda (o, q)$.
+
+\paragraph{Prolongement direct}
+Soit $p$ et $q$ deux points tels que $q$ est dans le prolongement interne de $\lambda (o, p)$. On dit que $q$ est dans le prolongement direct de $\lambda (o, p)$ si $\lambda (p, q)$ n'est constitué que d'un seul segment.
+
+\paragraph{Prolongement externe}
+Soit $p$ un point à l'intérieur du complexe et $q$ un point à l'extérieur. $q$ est dans le prolongement externe de $\lambda (o, p)$ s'il existe un point $q' \in [pq]$ tel que $q'$ est dans le prolongement direct de $\lambda (o, p)$.
+
+\paragraph{Prolongement vers une droite}
+Soit $p$ un point du complexe, et $d$ une droite axe-parallèle (à définir) qui intersecte des points dominés par $p$. Le prolongement de $\lambda (o, p)$ vers $d$ est un point $q \in d$ tel que $q$ est dans le prolongement interne ou externe de $\lambda (o, p)$. Si $q$ existe, il est unique.
+
+\paragraph{Remarque} Il peut y avoir plusieurs prolongement d'un chemin $\lambda (o, p)$ vers $d$.
+
+\paragraph{Extension}
+Soit $\lambda_1$ et $\lambda_2$ deux chemins dans le complexe. On dit que $\lambda_2$ est une extension de $\lambda_1$ si $\lambda_1 \subset \lambda_2$.
+
+\paragraph{Extension unitaire}
+Soit $\lambda_1$ et $\lambda_2$ deux chemins dans le complexe tels que $\lambda_2$ est une extension de $\lambda_1$. On dit que $\lambda_2$ est une extension unitaire de $\lambda_1$ si $\lambda_2 - \lambda_1$ n'est constitué que d'un seul segment.
+
+\section{Calcul du prolongement d'un chemin vers une droite}
+
+\'Etant donné $p$ un point appartenant à une et une seule arête $e$ concave du complexe, et soit une droite $d$ axe-parallèle qui intersecte des points dominés par $p$. On veut calculer le point $q$ qui est le prolongement de $\lambda (o, p)$ vers $d$. Soit $[rp]$ le dernier segment de $\lambda (o, p)$. Par définition $r$ domine $p$. \\
+
+On considère le plan $P$ contenant $[rp]$ et $e$ et on note $q_0$ le point d'intersection de $P$ et $d$. \\
+On considère le plan $Q$ à plat par rapport à l'obstacle de $e$ et on note $q_1$ le point d'intersection de $Q$ et $d$. \\
+$q \in [q_0 q_1]$
+
+\end{document}
+
+
+
+
+
+
