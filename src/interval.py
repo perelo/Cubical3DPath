@@ -151,3 +151,7 @@ class Interval3D(object):
         self.int_zx = int_zx
         self.int_yz = int_yz
 
+
+if __name__ == '__main__':
+    Intervals()
+
