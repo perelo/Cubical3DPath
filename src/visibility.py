@@ -16,6 +16,8 @@ LOWER_CHAIN = 1 << 0
 UPPER_CHAIN = 1 << 1
 ALL_CHAINS  = UPPER_CHAIN | LOWER_CHAIN
 
+EPSILON = 0.01
+
 
 def visibility(interval, p, q):
     f = lambda i, p, q: False
@@ -58,11 +60,12 @@ def _visibility_2D_point_point(interval, p, q):
     return mask
 
 
-def _visibility_2D_point_segment(interval, p, s):
+def _visibility_2D_point_segment_old(interval, p, s):
     '''
         find upper and lower visibility on s relative to p
         return the visible sub segment or None
         everything must be inside interval
+        /!\ Linear method /!\
     '''
 
     # determine the orientation of s
@@ -79,7 +82,6 @@ def _visibility_2D_point_segment(interval, p, s):
     p_min = p_max = None
 
     # first, check if both end points of s are visible
-    line_s = s.asLine()
     if _visibility_2D_point_point(interval, p, s.a) == 0:
         p_min = s.a
     if _visibility_2D_point_point(interval, p, s.b) == 0:
@@ -104,8 +106,62 @@ def _visibility_2D_point_segment(interval, p, s):
     return Segment(p_min, p_max) if p_min and p_max else None
 
 
-def _visibility_2D_segment_segment(interval, s1, s2):
-    pass
+def _visibility_2D_point_segment(interval, p, s):
+    '''
+        find upper and lower visibility on s relative to p
+        return the visible sub segment or None
+        everything must be inside interval
+        /!\ Binary search method /!\
+    '''
+    p_min = p_max = None
+
+    # determine the orientation of s
+    x, y = Point2D.x, Point2D.y
+    if s.a.y() == s.b.y():
+        x, y = y, x
+
+    # force s to be increasing
+    if y(s.a) > y(s.b):
+        s.a, s.b = s.b, s.a
+
+    vis = None
+    _find_bound.upper = _find_bound.lower = None
+    # first, check if both end points of s are visible
+    if _visibility_2D_point_point(interval, p, s.a) == 0:
+        p_min = s.a
+    else:
+        vis = _find_bound(LOWER_BOUND, interval, p, s, y)
+        p_min = _find_bound.lower
+
+    if _visibility_2D_point_point(interval, p, s.b) == 0:
+        p_max = s.b
+    else:
+        vis = _find_bound(UPPER_BOUND, interval, p, s, y)
+        p_max = _find_bound.upper
+
+    return Segment(p_min, p_max) if p_min and p_max else vis
+
+
+UPPER_BOUND = 0
+LOWER_BOUND = 1
+def _find_bound(bound, interval, p, s, y):
+    mid = s.middle()
+    vis = _visibility_2D_point_point(interval, p, mid)
+
+    if y(s.a)+EPSILON >= y(s.b):
+        return vis
+
+    if vis & LOWER_CHAIN != 0:
+         _find_bound(bound, interval, p, Segment(mid, s.b), y)
+    elif vis & UPPER_CHAIN != 0:
+         _find_bound(bound, interval, p, Segment(s.a, mid), y)
+    elif vis == 0: # visible
+        if bound == LOWER_BOUND:
+            _find_bound.lower = mid
+            _find_bound(bound, interval, p, Segment(s.a, mid), y)
+        else:
+            _find_bound.upper = mid
+            _find_bound(bound, interval, p, Segment(mid, s.b), y)
 
 
 def _visibility_3D(interval, p, q):
