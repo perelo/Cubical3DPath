@@ -12,6 +12,8 @@ import math
 
 from util import signum
 
+COORDINATES = (0, 1, 2)
+
 class Point2D(object):
     def __init__(self,x=0,y=0):
         self.coordinates = [float(x),float(y)]
@@ -207,6 +209,11 @@ class Edge3D(Segment):
     def __init__(self,a=Point3D(),b=Point3D(),type=UNKNOWN):
         super(Edge3D, self).__init__(a,b)
         self.type = type
+    def orientation(self):
+        ori = (self.a.x() != self.b.x(),
+               self.a.y() != self.b.y(),
+               self.a.z() != self.b.z())
+        return dict(zip(ori, COORDINATES))[True]
 
 class Vector3D(object):
     def __init__(self,x=0,y=0,z=0):
