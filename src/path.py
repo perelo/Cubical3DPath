@@ -25,9 +25,9 @@ def compute_extension_point(s, e, l):
     l_t_i = dict(zip(COORDINATES, ( 0, 0, 1 )))[e.orientation()]
 
     u = Vector3D.vector_from_two_points(s.a, s.b).normalized()
-    r_t = l.coord_points[2](s.b) + sqrt( (l.get()[l_t_i] / u_t(u))**2
-                                        - (l.get()[0] - l.coord_points[0](s.b))**2
-                                        - (l.get()[1] - l.coord_points[1](s.b))**2 )
+    r_t = l.coord_points[2](s.a) + sqrt( (l.get()[l_t_i] / u_t(u))**2
+                                        - (l.get()[0] - l.coord_points[0](s.a))**2
+                                        - (l.get()[1] - l.coord_points[1](s.a))**2 )
 
     return l.create_point(l.get()[0], l.get()[1], r_t)
 
