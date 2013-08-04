@@ -225,7 +225,8 @@ class Edge3D(Segment):
     # edge types
     UNKNOWN = 0
     CONVEX  = 1
-    CONCAVE = 2
+    CONCAVE1 = 2 # up than flat
+    CONCAVE2 = 3 # flat than up
     def __init__(self,a=Point3D(),b=Point3D(),type=UNKNOWN):
         super(Edge3D, self).__init__(a,b)
         self.type = type

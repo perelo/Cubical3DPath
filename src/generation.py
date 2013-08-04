@@ -363,14 +363,20 @@ def _compute_edge_type(points, e, step, x, y, z, create_point, first=True):
         q_down_back  = create_point(x(q), y(q)-step, z(q)-step) in points
 
         if (p_up and p_down) and (q_up and q_down):
-            b = (p_back  and q_back  and not p_up_back    and not q_up_back) or \
-                (p_front and q_front and not p_down_front and not q_down_front)
-            return Edge3D.CONCAVE if b else Edge3D.UNKNOWN
+            if   p_back  and q_back  and not p_up_back    and not q_up_back:
+                return Edge3D.CONCAVE1
+            elif p_front and q_front and not p_down_front and not q_down_front:
+                return Edge3D.CONCAVE2
+            else:
+                return Edge3D.UNKNOWN
 
         elif (p_front and p_back) and (q_front and q_back):
-            b = (p_up   and q_up   and not p_up_back    and not q_up_back) or \
-                (p_down and q_down and not p_down_front and not q_down_front)
-            return Edge3D.CONCAVE if b else Edge3D.UNKNOWN
+            if   p_up   and q_up   and not p_up_back    and not q_up_back:
+                return Edge3D.CONCAVE1
+            elif p_down and q_down and not p_down_front and not q_down_front:
+                return Edge3D.CONCAVE2
+            else:
+                return Edge3D.UNKNOWN
 
     # lonely edge that connect two cubical complexes
     #b = (p_up and p_front and not p_down and not p_back and \

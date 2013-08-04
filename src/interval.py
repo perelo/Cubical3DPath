@@ -34,14 +34,13 @@ class Intervals(object):
 
         #self.data = [(util.flat_segments(self.interval3D.segments), GL_LINES, 1, 1, 1)]
 
-        convex_edges  = []
-        concave_edges = []
+        typed_edges = { Edge3D.CONVEX: [], Edge3D.CONCAVE1: [], Edge3D.CONCAVE2: [] }
         for s in self.interval3D.segments:
-            edges = convex_edges if s.type == Edge3D.CONVEX else concave_edges
-            edges.append(s)
+            typed_edges[s.type].append(s)
 
-        self.data.append((util.flat_segments(convex_edges ), GL_LINES, 1, 1, 1))
-        self.data.append((util.flat_segments(concave_edges), GL_LINES, 1, 1, 0))
+        self.data.append((util.flat_segments(typed_edges[Edge3D.CONVEX]  ), GL_LINES, 1, 1, 1))
+        self.data.append((util.flat_segments(typed_edges[Edge3D.CONCAVE1]), GL_LINES, 1, 1, 0))
+        self.data.append((util.flat_segments(typed_edges[Edge3D.CONCAVE2]), GL_LINES, 1, 0, 1))
 
         # interval2Ds (projections of Interval3D)
         self.int2Ds = [self.interval3D.int_xy, self.interval3D.int_zx, self.interval3D.int_yz]
