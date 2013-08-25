@@ -19,15 +19,23 @@ def compute_extension_point(s, e, l):
         in which the last segment is s and s.b is on e (Edge3D)
     """
     vect_coords = ( Vector3D.x, Vector3D.y, Vector3D.z )
+    pts_coords  = ( Point3D.x,  Point3D.y,  Point3D.z )
 
-    # 't' means the axis to get depending on e and l orientation
+    if e.orientation() == l.orientation:
+        print "e and l have the same orientation (" + str(l.orientation) + ")"
+        return
+
+    # 't' means the axis to get depending on e and l orientations
     u_t   = dict(zip(COORDINATES, vect_coords))[e.orientation()]
-    l_t_i = dict(zip(COORDINATES, ( 0, 0, 1 )))[e.orientation()]
+    a_t   = dict(zip(COORDINATES,  pts_coords))[e.orientation()]
+
+    # l_t_i is the index of the coordinate in l that is the same as e orientation
+    l_t_i = dict(zip(COORDINATES, ( 0, int(bool(l.orientation)), 1 )))[e.orientation()]
 
     u = Vector3D.vector_from_two_points(s.a, s.b).normalized()
-    r_t = l.coord_points[2](s.b) + sqrt( (l.get()[l_t_i] / u_t(u))**2
-                                        - (l.get()[0] - l.coord_points[0](s.b))**2
-                                        - (l.get()[1] - l.coord_points[1](s.b))**2 )
+    r_t = l.coord_points[2](s.a) + sqrt( ( (l.get()[l_t_i] - a_t(s.a)) / u_t(u))**2
+                                        - (l.get()[0] - l.coord_points[0](s.a))**2
+                                        - (l.get()[1] - l.coord_points[1](s.a))**2 )
 
     return l.create_point(l.get()[0], l.get()[1], r_t)
 
