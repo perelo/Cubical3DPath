@@ -161,7 +161,7 @@ class Line3D(object):
         return 'Line3D(' + str(self.p) + ', ' + str(self.v) + ')'
 
 class LineAxis3D(Line3D):
-    _create_pt_fcts = ( lambda x, y, z: Point3D(z, x, y),
+    _create_pt_fcts = ( lambda x, y, z: Point3D(y, z, x),
                         lambda x, y, z: Point3D(x, z, y),
                         lambda x, y, z: Point3D(x, y, z) )
     _coord_pts_fcts  = ( (Point3D.y, Point3D.z, Point3D.x),
@@ -175,6 +175,7 @@ class LineAxis3D(Line3D):
         v = Vector3D.vector_from_two_points(p, LineAxis3D.dict_create_point[t](x,y,1))
         super(LineAxis3D, self).__init__(p,v)
         self.coordinates = [x,y]
+        self.orientation = t
         self.create_point = LineAxis3D.dict_create_point[t]
         self.coord_points = LineAxis3D.dict_coord_points[t]
     def get(self):
