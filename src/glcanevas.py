@@ -23,7 +23,7 @@ class CanevasGLWidget(QGLWidget):
     def __init__(self, parent):
         super(CanevasGLWidget, self).__init__(parent)
         self.setMouseTracking(True)
-        self.setMinimumSize(500, 500)
+        self.setMinimumSize(800, 800)
 
         self.camera = Camera()
         self.camera.setSceneRadius(20)
