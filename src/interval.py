@@ -29,6 +29,25 @@ class Intervals(object):
         p_max = Point3D(15, 15, 15)
         step = 2
 
+        # self.make_interval_2D(p_min, p_max, step)
+        self.make_interval_3D(p_min, p_max, step, interval3D)
+
+
+    def make_interval_2D(self, p_min, p_max, step):
+        self.interval2D = gen.generate_interval2D(p_min, p_max, step, True)
+
+        int_3D_pts = [Point3D(p.x(), p.y(), 0) for p in self.interval2D.points]
+        self.data.append((util.flat_points(int_3D_pts), GL_LINE_LOOP, 1, 0, 0))
+        self.data.append((util.flat_points(int_3D_pts), GL_POINTS, 1, 1, 1))
+        squares = []
+        for s in self.interval2D.squares:
+            squares.append(Point3D(s[0].x(), s[0].y(), 0))
+            squares.append(Point3D(s[1].x(), s[1].y(), 0))
+        self.data.append((util.flat_points(squares), GL_LINES, 1, 0, 1))
+        self.int2Ds = []
+
+
+    def make_interval_3D(self, p_min, p_max, step, interval3D=None):
         self.interval3D = gen.generate_interval3D(p_min, p_max, step, self.degenerate) \
                                 if not interval3D else interval3D
 
