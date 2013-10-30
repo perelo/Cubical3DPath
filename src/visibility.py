@@ -20,9 +20,9 @@ EPSILON = 0.01
 
 
 def visibility(interval, p, q):
-    f = lambda i, p, q: False
-    d = dict(((Interval2D, _visibility_2D),
-              (Interval3D, _visibility_3D)))
+    d = { Interval2D: _visibility_2D,
+          Interval3D: _visibility_3D }
+    f = lambda i, p, q: False   # if interval's type is crap, return False
     return d.get(type(interval), f)(interval, p, q)
 
 
@@ -163,6 +163,8 @@ def _find_bound(bound, interval, p, s, y):
             _find_bound.upper = mid
             _find_bound(bound, interval, p, Segment(mid, s.b), y)
 
+def _visibility_2D_segment_segment(interval, p, q):
+    return False
 
 def _visibility_3D(interval, p, q):
     zx = (Point3D.z, Point3D.x)
