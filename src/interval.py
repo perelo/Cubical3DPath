@@ -30,7 +30,6 @@ class Intervals(object):
         step = 2
 
         # self.make_interval_2D(p_min, p_max, step)
-        self.make_interval_3D(p_min, p_max, step, interval3D)
 
 
     def make_interval_2D(self, p_min, p_max, step):
