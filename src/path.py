@@ -18,6 +18,13 @@ def compute_extension_point(s, e, l):
         Compute the point on l (LineAxis3D) that is the extension of the path
         in which the last segment is s and s.b is on e (Edge3D)
     """
+    # coord_of_i are the coord represented by l.get[x] depending on l's orientation
+    coord_of_0 = ( 1, 0, 0 )  # y, x, x
+    coord_of_1 = ( Point3D.z, Point3D.z, Point3D.y )
+    a = s.asLine3D().point_at(l.get()[0], coord_of_0[l.orientation])
+    if not a or coord_of_1[l.orientation](a) < l.get()[1]:
+        return      # we would bend concavely or up to infinty...
+
     vect_coords = ( Vector3D.x, Vector3D.y, Vector3D.z )
 
     # 't' means the axis to get depending on e and l orientation
