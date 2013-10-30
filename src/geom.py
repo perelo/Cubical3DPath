@@ -159,6 +159,25 @@ class Line3D(object):
         self.v = v # vector director of self
     def __str__(self):
         return 'Line3D(' + str(self.p) + ', ' + str(self.v) + ')'
+    def point_at(self, val, axis):
+        fctsp = ( (Point3D.x, Point3D.y, Point3D.z),
+                  (Point3D.y, Point3D.x, Point3D.z),
+                  (Point3D.z, Point3D.x, Point3D.y) )
+        fctsv = ( (Vector3D.x, Vector3D.y, Vector3D.z),
+                  (Vector3D.y, Vector3D.x, Vector3D.z),
+                  (Vector3D.z, Vector3D.x, Vector3D.y) )
+        create_pts = ( lambda x, y, z: Point3D(x, y, z),
+                       lambda x, y, z: Point3D(y, x, z),
+                       lambda x, y, z: Point3D(y, z, x) )
+        xp, yp, zp = dict(zip(COORDINATES, fctsp))[axis]
+        xv, yv, zv = dict(zip(COORDINATES, fctsv))[axis]
+        create_pt  = dict(zip(COORDINATES, create_pts))[axis]
+        # compute the damn thing
+        if xv(self.v) != 0:     # else, return None
+            param =  (val - xp(self.p)) / xv(self.v)
+            y = yp(self.p) + (param * yv(self.v))
+            z = zp(self.p) + (param * zv(self.v))
+            return create_pt(val, y, z)
 
 class LineAxis3D(Line3D):
     _create_pt_fcts = ( lambda x, y, z: Point3D(z, x, y),
@@ -174,6 +193,7 @@ class LineAxis3D(Line3D):
         p = LineAxis3D.dict_create_point[t](x,y,0)
         v = Vector3D.vector_from_two_points(p, LineAxis3D.dict_create_point[t](x,y,1))
         super(LineAxis3D, self).__init__(p,v)
+        self.orientation = t
         self.coordinates = [x,y]
         self.create_point = LineAxis3D.dict_create_point[t]
         self.coord_points = LineAxis3D.dict_coord_points[t]
