@@ -23,7 +23,7 @@ class CanevasGLWidget(QGLWidget):
     def __init__(self, parent):
         super(CanevasGLWidget, self).__init__(parent)
         self.setMouseTracking(True)
-        self.setMinimumSize(500, 500)
+        self.setMinimumSize(800, 800)
 
         self.camera = Camera()
         self.camera.setSceneRadius(20)
@@ -37,9 +37,10 @@ class CanevasGLWidget(QGLWidget):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         self.camera.transform()
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
 
+        glPointSize(4)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         #glEnable(GL_DEPTH_TEST);    # don't show back faces (test depths)
@@ -79,12 +80,13 @@ class CanevasGLWidget(QGLWidget):
 
     def resizeGL(self, widthInPixels, heightInPixels):
         self.camera.setViewportDimensions(widthInPixels, heightInPixels)
-        glViewport(0, 0, widthInPixels, heightInPixels)
+        # glViewport(0, 0, widthInPixels, heightInPixels)
 
 
     def initializeGL(self):
-        glClearColor(0.0, 0.0, 0.0, 1.0)
-        glClearDepth(1.0)
+        pass
+        # glClearColor(0.0, 0.0, 0.0, 1.0)
+        # glClearDepth(1.0)
 
 
     def mouseMoveEvent(self, mouseEvent):
@@ -110,3 +112,9 @@ class CanevasGLWidget(QGLWidget):
     def load_data(self, f):
         self.model.init_data(load(f))
 
+    def keyPressEvent(self, event):
+        QtGui.QWidget.QKeyPressEvent(self, event)
+        print "key pressed :", event
+
+    def eventFilter(self, obj, event):
+        print "event filter"

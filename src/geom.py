@@ -118,7 +118,7 @@ class Segment(object):
         C = -(A * self.a.x()) - (B * self.a.y())
         return Line2D(A,B,C)
     def asLine3D(self):
-        return Line3D(self.a, Vector3D.vector_from_two_points(self.a, self.b))
+        return Line3D(self.a, Vector3D.vector_from_two_points(self.a, self.b).normalized())
     def intersection(self,other,open_seg=False):
         p = self.asLine2D().intersection(other)
         return p if p is not None and p.is_in_rectangle(self, open_seg) and p.is_in_rectangle(other, open_seg) else None
@@ -250,11 +250,49 @@ class Edge3D(Segment):
     def __init__(self,a=Point3D(),b=Point3D(),type=UNKNOWN):
         super(Edge3D, self).__init__(a,b)
         self.type = type
+    def asLineAxis3D(self):
+        l = LineAxis3D(0, 0, self.orientation())
+        l.get()[0] = l.coord_points[0](self.a)
+        l.get()[1] = l.coord_points[1](self.a)
+        return l
     def orientation(self):
         ori = (self.a.x() != self.b.x(),
                self.a.y() != self.b.y(),
                self.a.z() != self.b.z())
         return dict(zip(ori, COORDINATES))[True]
+    def same_coordinates(self, other):
+        ori1 = self.orientation()
+        ori2 = other.orientation()
+        l1 = LineAxis3D(0,0,ori1)
+        l2 = LineAxis3D(0,0,ori2)
+        if ori1 == ori2:
+            return (l1.coord_points[0](self.a), l1.coord_points[1](self.a)) < \
+                   (l2.coord_points[0](other.a), l2.coord_points[1](other.a))
+        else:
+            if (ori1, ori2) == (COORDINATES[0], COORDINATES[1]) or \
+               (ori2, ori1) == (COORDINATES[0], COORDINATES[1]):
+               t = Point3D.z
+            if (ori1, ori2) == (COORDINATES[0], COORDINATES[2]) or \
+               (ori2, ori1) == (COORDINATES[0], COORDINATES[2]):
+               t = Point3D.y
+            if (ori1, ori2) == (COORDINATES[1], COORDINATES[2]) or \
+               (ori2, ori1) == (COORDINATES[1], COORDINATES[2]):
+               t = Point3D.x
+            return t(self.a) < t(other.a)
+    def __contains__(self,other):
+        if isinstance(other, Point3D):
+            cs = ( (Point3D.x, Point3D.y, Point3D.z),
+                   (Point3D.y, Point3D.x, Point3D.z),
+                   (Point3D.z, Point3D.x, Point3D.y) )
+            c = dict(zip(COORDINATES, cs))[self.orientation()]
+            # we assume that c[1](self.a) == c[1](self.b), same for c[2]
+            return ((c[0](other) <= c[0](self.a) and \
+                     c[0](other) >= c[0](self.b)) or \
+                    (c[0](other) <= c[0](self.b) and \
+                     c[0](other) >= c[0](self.a))) and \
+                   c[1](other) == c[1](self.a) and \
+                   c[2](other) == c[2](self.a)
+
 
 class Vector3D(object):
     def __init__(self,x=0,y=0,z=0):

@@ -111,6 +111,20 @@ class MainWindow(QtGui.QMainWindow):
         else:
             self.canevas.model.remove_projections()
 
+    def keyPressEvent(self, keyEvent):
+        import interval
+        key = keyEvent.key()
+        if key == QtCore.Qt.Key_A:
+            interval.Ax += 0.1
+        elif key == QtCore.Qt.Key_Z:
+            interval.Ax -= 0.1
+        elif key == QtCore.Qt.Key_Q:
+            interval.Bx += 0.1
+        elif key == QtCore.Qt.Key_S:
+            interval.Bx -= 0.1
+        self.canevas.model.init_data()
+        self.canevas.update()
+
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

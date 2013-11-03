@@ -12,8 +12,11 @@ from OpenGL.GL import *     # types : GL_POINTS, GL_LINES, ...
 
 import generation as gen
 from geom import *
+from path import *
 import util
 
+Ax = 7.5
+Bx = 6.0
 
 class Intervals(object):
 
@@ -30,6 +33,9 @@ class Intervals(object):
         step = 2
 
         # self.make_interval_2D(p_min, p_max, step)
+        # self.make_interval_3D(p_min, p_max, step, interval3D)
+        # self.path_stuff()
+        self.extension_point_test()
 
 
     def make_interval_2D(self, p_min, p_max, step):
@@ -56,15 +62,68 @@ class Intervals(object):
         for s in self.interval3D.segments:
             typed_edges[s.type].append(s)
 
+        # concave_edges = typed_edges[Edge3D.CONCAVE2]+typed_edges[Edge3D.CONCAVE1]
+        # concave_edges = sorted(concave_edges, cmp=Edge3D.same_coordinates)
+        # g = 0
+        # for e in concave_edges:
+        #     g += 1.0 / len(concave_edges)
+        #     self.data.append(([e.a.get(),e.b.get()], GL_LINES, 1, g, 0))
+
         self.data.append((util.flat_segments(typed_edges[Edge3D.CONVEX]  ), GL_LINES, 1, 1, 1))
         self.data.append((util.flat_segments(typed_edges[Edge3D.CONCAVE1]), GL_LINES, 1, 1, 0))
         self.data.append((util.flat_segments(typed_edges[Edge3D.CONCAVE2]), GL_LINES, 1, 0, 1))
+        # self.data.append((util.flat_points((p_min,p_max)), GL_POINTS, 1, 0, 0))
+
+        #path_points = shortest_path_from_signature(p_min, p_max, typed_edges[Edge3D.CONCAVE2]+typed_edges[Edge3D.CONCAVE1])
+        #self.data.append((util.flat_points(path_points), GL_LINE_STRIP, 1, 0, 0))
 
         # interval2Ds (projections of Interval3D)
         self.int2Ds = [self.interval3D.int_xy, self.interval3D.int_zx, self.interval3D.int_yz]
         for i in xrange(len(self.int2Ds)):
             self.int2Ds[i] = (util.flat_points(self.int2Ds[i].points), GL_LINE_LOOP, 1, 0, 0)
 
+
+    def extension_point_test(self):
+        A = Point3D(Ax, 0, 0)
+        B = Point3D(Bx, 10, 10)
+
+        signature = [ Edge3D(Point3D(0,  10, 10), Point3D(10, 10, 10)),
+                      Edge3D(Point3D(5,  10, 20), Point3D(5,  20, 20)),
+                      Edge3D(Point3D(10, 20, 25), Point3D(10, 20, 35)) ]
+
+        s = Segment(A, B)
+        path_segs = [s]
+        path_pts = [A, B]
+        e1 = signature[0]
+        for e2 in signature[1:]:
+            ext_point = compute_extension_point(s, e1, e2.asLineAxis3D())
+            if not ext_point:
+                print "failed to compute ext point at", s, e1, e2
+                break
+            s = Segment(B, ext_point)
+            B = ext_point
+            path_pts.append(s.b)
+            path_segs.append(s)
+
+        self.data.append((util.flat_segments(path_segs), GL_LINES, 1, 1, 0))
+        self.data.append((util.flat_points(path_pts), GL_POINTS, 1, 1, 1))
+
+        # self.data.append((util.flat_points((A,B)), GL_POINTS, 1, 1, 1))
+        self.data.append((util.flat_segments(signature), GL_LINES, 1, 0, 0))
+
+        # if ext_point:
+        #     ext_path = Segment(B, ext_point)
+        #     self.data.append((util.flat_segments((s,ext_path)), GL_LINES, 1, 1, 0))
+        #     self.data.append((ext_point.get(), GL_POINTS, 0, 1, 1))
+        #     print ext_point
+
+
+    def path_stuff(self):
+        l_list = []
+        p_list = []
+        l = LineAxis3D(10.0, 15.0, COORDINATES[0])
+        s =  Segment(Point3D(-0.58, -1.69, -1.16), Point3D(2.05, 4.49, 4.5))
+        e = Edge3D(Point3D(0.8, 4.49, 4.5), Point3D(2.8, 4.49, 4.5))
 
     def add_projections(self):
         if self.int2Ds not in self.data:
